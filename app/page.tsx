@@ -56,19 +56,16 @@ export default async function Home() {
         id="collection"
         className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-16"
       >
-        {/* Clear Glass Showcase Tray where cards sit */}
-        <div className="clear-glass-tray liquid-glass-sheen rounded-[32px] sm:rounded-[40px] md:rounded-[44px] p-3 sm:p-5 md:p-7">
-          {/* Mobile Horizontal Carousel & Desktop Grid */}
-          <div className="flex items-stretch md:grid md:grid-cols-2 gap-4 md:gap-6 overflow-x-auto md:overflow-visible snap-x snap-mandatory scroll-px-4 no-scrollbar">
-            {products?.slice(0, 4).map((product: Product, index: number) => (
-              <div
-                key={product.id}
-                className="w-[72vw] min-w-[72vw] sm:w-[48vw] sm:min-w-[48vw] shrink-0 snap-start md:w-auto md:min-w-0 md:shrink flex flex-col h-full"
-              >
-                <ProductCard product={product} isNew={index === 0} />
-              </div>
-            ))}
-          </div>
+        {/* Mobile Horizontal Carousel & Desktop Grid */}
+        <div className="flex items-stretch md:grid md:grid-cols-2 gap-4 md:gap-6 overflow-x-auto md:overflow-visible snap-x snap-mandatory scroll-px-4 no-scrollbar -mx-4 px-4 md:scroll-px-0 md:mx-0 md:px-0 pb-2">
+          {products?.slice(0, 4).map((product: Product, index: number) => (
+            <div
+              key={product.id}
+              className="w-[72vw] min-w-[72vw] sm:w-[48vw] sm:min-w-[48vw] shrink-0 snap-start md:w-auto md:min-w-0 md:shrink flex flex-col h-full"
+            >
+              <ProductCard product={product} isNew={index === 0} />
+            </div>
+          ))}
         </div>
       </section>
       {/* Set 1: Editorial Campaign Banners (Tees & Tanks, Pants) */}
