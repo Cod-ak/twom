@@ -70,8 +70,8 @@ export default function CategoryShowcase({
         </GlassSurface>
       </div>
 
-      {/* Frosted Glass Showcase Tray where cards sit */}
-      <div className="frosted-showcase-tray liquid-glass-sheen rounded-[32px] sm:rounded-[40px] md:rounded-[44px] p-3 sm:p-5 md:p-7">
+      {/* Clear Glass Showcase Tray where cards sit */}
+      <div className="clear-glass-tray liquid-glass-sheen rounded-[32px] sm:rounded-[40px] md:rounded-[44px] p-3 sm:p-5 md:p-7">
         {/* Horizontal Scrollable Product Carousel */}
         <div className="flex items-stretch gap-4 md:gap-6 overflow-x-auto no-scrollbar snap-x snap-mandatory scroll-px-3 md:scroll-px-0">
           {displayedItems.map((item) => (

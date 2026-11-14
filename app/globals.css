@@ -339,7 +339,7 @@ button.liquid-glass-pill:hover:not(:disabled) {
     inset 0 -1px 1px 0 rgba(0, 0, 0, 0.3);
 }
 
-/* Frosted Glass Showcase Tray (where cards sit) */
+/* Frosted Glass Showcase Tray (Milky / Etched Glass) */
 .frosted-showcase-tray {
   position: relative;
   background: linear-gradient(
@@ -357,6 +357,26 @@ button.liquid-glass-pill:hover:not(:disabled) {
     0 4px 16px -2px rgba(16, 24, 40, 0.03),
     inset 0 2px 1.5px 0 rgba(255, 255, 255, 1),
     inset 0 -1.5px 2px 0 rgba(0, 0, 0, 0.02);
+}
+
+/* Clear Glass Showcase Tray (Ultra-Transparent Crystal Glass / Acrylic Stage) */
+.clear-glass-tray {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.25) 0%,
+    rgba(255, 255, 255, 0.08) 35%,
+    rgba(255, 255, 255, 0.04) 70%,
+    rgba(255, 255, 255, 0.18) 100%
+  );
+  backdrop-filter: blur(8px) saturate(140%);
+  -webkit-backdrop-filter: blur(8px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow:
+    0 20px 50px -15px rgba(0, 0, 0, 0.05),
+    0 4px 16px -2px rgba(0, 0, 0, 0.02),
+    inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 1.5px 0 rgba(0, 0, 0, 0.03);
 }
 
 /* Dark mode adjustments */
@@ -428,4 +448,19 @@ button.liquid-glass-pill:hover:not(:disabled) {
     0 24px 60px -15px rgba(0, 0, 0, 0.55),
     inset 0 2px 1.5px 0 rgba(255, 255, 255, 0.3),
     inset 0 -1.5px 2px 0 rgba(0, 0, 0, 0.4);
+}
+
+.dark .clear-glass-tray {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.02) 40%,
+    rgba(255, 255, 255, 0.01) 70%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow:
+    0 24px 60px -15px rgba(0, 0, 0, 0.5),
+    inset 0 1.5px 1.2px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -1px 1.5px 0 rgba(0, 0, 0, 0.35);
 }

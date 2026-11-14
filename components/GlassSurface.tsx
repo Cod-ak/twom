@@ -540,8 +540,7 @@ const GlassSurface = ({
   const shapeMapRef = useRef<string>('');
   const mapUrlRef = useRef('');
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const settingsRef = useRef<GlassSettings | null>(null);
-  settingsRef.current = {
+  const settingsRef = useRef<GlassSettings>({
     backdrop,
     displace,
     saturation,
@@ -551,7 +550,31 @@ const GlassSurface = ({
     blueOffset,
     xChannel,
     yChannel,
-  };
+  });
+
+  useEffect(() => {
+    settingsRef.current = {
+      backdrop,
+      displace,
+      saturation,
+      distortionScale,
+      redOffset,
+      greenOffset,
+      blueOffset,
+      xChannel,
+      yChannel,
+    };
+  }, [
+    backdrop,
+    displace,
+    saturation,
+    distortionScale,
+    redOffset,
+    greenOffset,
+    blueOffset,
+    xChannel,
+    yChannel,
+  ]);
 
   const generateDisplacementMap = () => {
     const rect = containerRef.current?.getBoundingClientRect();
