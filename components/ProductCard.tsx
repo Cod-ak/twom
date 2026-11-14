@@ -1,11 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Product } from "@/lib/types";
 import { formatNaira } from "@/lib/utils";
 import { useUIStore } from "@/lib/ui-store";
-import GlassSurface from "@/components/GlassSurface";
 
 interface ProductCardProps {
   product: Product & {
@@ -17,6 +17,7 @@ interface ProductCardProps {
 
 export default function ProductCard({ product, isNew }: ProductCardProps) {
   const openQuickBuy = useUIStore((state) => state.openQuickBuy);
+  const [isLiked, setIsLiked] = useState(false);
 
   const stock =
     typeof product.stock_quantity === "number" ? product.stock_quantity : 999;
@@ -29,23 +30,18 @@ export default function ProductCard({ product, isNew }: ProductCardProps) {
     openQuickBuy(product);
   };
 
+  const handleToggleWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsLiked((prev) => !prev);
+  };
+
   const productHref = `/products/${product.slug || product.id}`;
 
   return (
-    <GlassSurface
-      borderRadius={24}
-      borderWidth={0.08}
-      distortionScale={-140}
-      displace={0.5}
-      backgroundOpacity={0.08}
-      redOffset={0}
-      greenOffset={10}
-      blueOffset={20}
-      className="group w-full h-full hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.55)] transition-all duration-300"
-      contentClassName="relative z-[1] flex flex-col justify-between w-full h-full p-3"
-    >
+    <div className="group relative flex flex-col justify-between w-full h-full bg-white rounded-[32px] sm:rounded-[36px] border-[3.5px] border-black p-3.5 sm:p-4 shadow-md hover:shadow-xl transition-all duration-300">
       {/* Inner Rounded Image Container */}
-      <div className="relative aspect-3/4 w-full overflow-hidden rounded-2xl bg-zinc-100 isolate shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)]">
+      <div className="relative aspect-[4/4.3] w-full overflow-hidden rounded-[22px] sm:rounded-[26px] bg-zinc-100 isolate">
         <Link
           href={productHref}
           className="relative block w-full h-full cursor-pointer"
@@ -61,65 +57,83 @@ export default function ProductCard({ product, isNew }: ProductCardProps) {
               }`}
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-xs uppercase tracking-widest text-zinc-500">
+            <div className="w-full h-full flex items-center justify-center text-xs uppercase tracking-widest text-zinc-400">
               No Image
             </div>
           )}
         </Link>
 
+        {/* Wishlist Heart Button in Top-Left Position */}
+        <button
+          type="button"
+          onClick={handleToggleWishlist}
+          aria-label={isLiked ? "Remove from wishlist" : "Add to wishlist"}
+          className="absolute top-3 left-3 z-10 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black/75 backdrop-blur-md border border-white/20 text-white flex items-center justify-center transition-all hover:scale-110 active:scale-90 shadow-md cursor-pointer"
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill={isLiked ? "currentColor" : "none"}
+            stroke="currentColor"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className={isLiked ? "text-rose-500 fill-rose-500" : "text-white"}
+          >
+            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+          </svg>
+        </button>
+
         {/* Vertical Badge in Top-Right Position */}
         {isOutOfStock ? (
-          <span className="pointer-events-none absolute top-0 right-0 z-10 bg-zinc-900/90 text-zinc-300 backdrop-blur-md border-b border-l border-white/10 text-[9px] font-bold tracking-widest px-1.5 py-2.5 [writing-mode:vertical-rl] select-none uppercase font-mono shadow-xs rounded-tr-2xl rounded-bl-lg">
+          <span className="pointer-events-none absolute top-3 right-3 z-10 bg-zinc-900 text-white text-[9px] font-black tracking-widest px-2 py-3.5 rounded-full [writing-mode:vertical-rl] select-none uppercase shadow-md">
             SOLD OUT
           </span>
         ) : product.saveBadge ? (
-          <span className="pointer-events-none absolute top-0 right-0 z-10 bg-rose-600/90 text-white backdrop-blur-md border-b border-l border-white/20 text-[9px] font-bold tracking-widest px-1.5 py-2.5 [writing-mode:vertical-rl] select-none uppercase font-mono shadow-xs rounded-tr-2xl rounded-bl-lg">
+          <span className="pointer-events-none absolute top-3 right-3 z-10 bg-rose-600 text-white text-[10px] font-black tracking-widest px-2 py-3.5 rounded-full [writing-mode:vertical-rl] select-none uppercase shadow-md">
             {product.saveBadge}
           </span>
         ) : isNew ? (
-          <span className="pointer-events-none absolute top-0 right-0 z-10 bg-white text-black font-black text-[10px] tracking-widest px-1.5 py-2.5 [writing-mode:vertical-rl] select-none uppercase shadow-xs rounded-tr-2xl rounded-bl-lg">
+          <span className="pointer-events-none absolute top-3 right-3 z-10 bg-white text-black font-black text-[10px] tracking-widest px-2 py-3.5 rounded-full [writing-mode:vertical-rl] select-none uppercase shadow-md">
             NEW
           </span>
         ) : null}
       </div>
 
-      {/* Product Title Only */}
+      {/* Product Title */}
       <Link
         href={productHref}
-        className="hover:opacity-75 transition-opacity block mt-3 mb-1.5 relative z-2"
+        className="hover:opacity-75 transition-opacity block mt-3.5 mb-2"
       >
-        <h3 className="text-sm font-semibold text-black leading-snug line-clamp-1 tracking-wide">
+        <h3 className="text-lg sm:text-xl font-bold text-black leading-snug line-clamp-1 tracking-tight">
           {product.name}
         </h3>
       </Link>
 
-      {/* Inventory Stock Pill Slot - reserves space when stock > 10 so all cards have identical length */}
-      <div className="min-h-5.5 mb-2.5 flex items-center relative z-2">
-        {stock <= 10 &&
-          (isOutOfStock ? (
-            <span className="liquid-glass-pill inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono uppercase tracking-wider font-semibold text-zinc-700">
-              <span className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
-              Out of stock
-            </span>
-          ) : stock <= 5 ? (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono uppercase tracking-wider font-semibold bg-rose-50 text-rose-800 border border-rose-200/80 backdrop-blur-xs">
-              <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
-              Only {stock} left
-            </span>
-          ) : (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono uppercase tracking-wider font-semibold bg-amber-50 text-amber-900 border border-amber-200/80 backdrop-blur-xs">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-              Only {stock} left
-            </span>
-          ))}
+      {/* Inventory Stock Pill */}
+      <div className="flex items-center min-h-6 mb-3">
+        {isOutOfStock ? (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-100 text-zinc-600 text-[11px] font-black tracking-wider uppercase border border-zinc-200">
+            <span className="w-2 h-2 rounded-full bg-zinc-400" />
+            OUT OF STOCK
+          </span>
+        ) : (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#ffce27] text-black text-[11px] font-black tracking-wider uppercase shadow-xs">
+            <span className="w-2 h-2 rounded-full bg-black" />
+            {stock <= 10 ? `ONLY ${stock} LEFT` : "IN STOCK"}
+          </span>
+        )}
       </div>
 
-      {/* Bottom Action Row: Price Pill (Left) + Cart Pill Button (Right) */}
-      <div className="flex items-center justify-between gap-2 mt-auto relative z-2">
-        <div className="liquid-glass-pill text-black rounded-full px-3.5 py-1.5 text-xs md:text-sm font-bold flex items-center gap-1.5 shrink min-w-0">
-          <span className="truncate">{formatNaira(product.price)}</span>
+      {/* Bottom Action Row: Bold Price (Left) + Yellow Cart Button (Right) */}
+      <div className="flex items-center justify-between gap-3 mt-auto pt-2">
+        <div className="flex flex-col">
+          <span className="text-xl sm:text-2xl font-black text-black tracking-tight leading-none">
+            {formatNaira(product.price)}
+          </span>
           {product.originalPrice && product.originalPrice > product.price && (
-            <span className="text-zinc-500 line-through text-[11px] font-medium shrink-0">
+            <span className="text-zinc-400 line-through text-xs font-semibold mt-1">
               {formatNaira(product.originalPrice)}
             </span>
           )}
@@ -134,19 +148,19 @@ export default function ProductCard({ product, isNew }: ProductCardProps) {
               ? `${product.name} is out of stock`
               : `Quick buy ${product.name}`
           }
-          className={`liquid-glass-pill rounded-full px-4 py-2 flex items-center justify-center transition-all shrink-0 touch-manipulation ${
+          className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 transition-all touch-manipulation cursor-pointer ${
             isOutOfStock
-              ? "opacity-40 cursor-not-allowed"
-              : "text-black hover:scale-105 active:scale-95 cursor-pointer"
+              ? "bg-zinc-200 text-zinc-400 cursor-not-allowed"
+              : "bg-[#ffce27] text-black shadow-[0_8px_20px_rgba(255,206,39,0.7)] hover:scale-105 active:scale-95"
           }`}
         >
           <svg
-            width="15"
-            height="15"
+            width="20"
+            height="20"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            strokeWidth="2"
+            strokeWidth="2.2"
             strokeLinecap="round"
             strokeLinejoin="round"
             className="pointer-events-none"
@@ -157,6 +171,6 @@ export default function ProductCard({ product, isNew }: ProductCardProps) {
           </svg>
         </button>
       </div>
-    </GlassSurface>
+    </div>
   );
 }

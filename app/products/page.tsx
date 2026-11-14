@@ -15,20 +15,23 @@ export default async function ProductsPage({
 }) {
   const { category } = await searchParams;
 
-  // Build the query
-  let query = supabase
-    .from("products")
-    .select("*")
-    .eq("is_active", true);
+  let products: ShowcaseItem[] | null = null;
+  let error: unknown = null;
 
-  // If there's a category in the URL, filter by it case-insensitively
-  if (category) {
-    query = query.ilike("category", category);
+  try {
+    let query = supabase.from("products").select("*").eq("is_active", true);
+
+    if (category) {
+      query = query.ilike("category", category);
+    }
+
+    const res = await query.order("created_at", { ascending: false });
+    products = (res.data as ShowcaseItem[] | null) || null;
+    error = res.error;
+  } catch (err) {
+    error = err;
+    products = null;
   }
-
-  const { data: products, error } = await query.order("created_at", {
-    ascending: false,
-  });
 
   // Fall back to showcase previews for matching campaign categories when DB is empty
   const fallbackProducts =
@@ -91,11 +94,13 @@ export default async function ProductsPage({
           </div>
         </div>
 
-        {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 items-stretch">
-          {displayedProducts.map((product: ShowcaseItem) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
+        {/* Frosted Glass Stage Tray */}
+        <div className="liquid-glass-stage rounded-[36px] sm:rounded-[44px] md:rounded-[48px] p-4 sm:p-6 md:p-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 items-stretch">
+            {displayedProducts.map((product: ShowcaseItem) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
         </div>
       </div>
     </div>

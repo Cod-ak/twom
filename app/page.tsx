@@ -54,18 +54,21 @@ export default async function Home() {
       {/* Featured Pieces Selection */}
       <section
         id="collection"
-        className="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-27 border-t border-twom-border/40"
+        className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-20"
       >
-        {/* Mobile Horizontal Carousel & Desktop Grid */}
-        <div className="flex items-stretch md:grid md:grid-cols-2 gap-4 md:gap-6 overflow-x-auto md:overflow-visible snap-x snap-mandatory scroll-px-4 no-scrollbar -mx-4 px-4 md:scroll-px-0 md:mx-0 md:px-0">
-          {products?.slice(0, 4).map((product: Product, index: number) => (
-            <div
-              key={product.id}
-              className="w-[68vw] min-w-[68vw] sm:w-[48vw] sm:min-w-[48vw] shrink-0 snap-start md:w-auto md:min-w-0 md:shrink flex flex-col h-full"
-            >
-              <ProductCard product={product} isNew={index === 0} />
-            </div>
-          ))}
+        {/* Frosted Glass Stage Tray */}
+        <div className="liquid-glass-stage rounded-[36px] sm:rounded-[44px] md:rounded-[48px] p-4 sm:p-6 md:p-8">
+          {/* Mobile Horizontal Carousel & Desktop Grid */}
+          <div className="flex items-stretch md:grid md:grid-cols-2 gap-4 md:gap-6 overflow-x-auto md:overflow-visible snap-x snap-mandatory scroll-px-4 no-scrollbar">
+            {products?.slice(0, 4).map((product: Product, index: number) => (
+              <div
+                key={product.id}
+                className="w-[72vw] min-w-[72vw] sm:w-[48vw] sm:min-w-[48vw] shrink-0 snap-start md:w-auto md:min-w-0 md:shrink flex flex-col h-full"
+              >
+                <ProductCard product={product} isNew={index === 0} />
+              </div>
+            ))}
+          </div>
         </div>
       </section>
       {/* Set 1: Editorial Campaign Banners (Tees & Tanks, Pants) */}
