@@ -54,10 +54,10 @@ export default async function Home() {
       {/* Featured Pieces Selection */}
       <section
         id="collection"
-        className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-20"
+        className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-16"
       >
-        {/* Frosted Glass Stage Tray */}
-        <div className="liquid-glass-stage rounded-[36px] sm:rounded-[44px] md:rounded-[48px] p-4 sm:p-6 md:p-8">
+        {/* Frosted Glass Showcase Tray where cards sit */}
+        <div className="frosted-showcase-tray liquid-glass-sheen rounded-[32px] sm:rounded-[40px] md:rounded-[44px] p-3 sm:p-5 md:p-7">
           {/* Mobile Horizontal Carousel & Desktop Grid */}
           <div className="flex items-stretch md:grid md:grid-cols-2 gap-4 md:gap-6 overflow-x-auto md:overflow-visible snap-x snap-mandatory scroll-px-4 no-scrollbar">
             {products?.slice(0, 4).map((product: Product, index: number) => (
