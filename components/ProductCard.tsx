@@ -6,7 +6,6 @@ import Link from "next/link";
 import { Product } from "@/lib/types";
 import { formatNaira } from "@/lib/utils";
 import { useUIStore } from "@/lib/ui-store";
-import GlassSurface from "./GlassSurface";
 
 interface ProductCardProps {
   product: Product & {
@@ -112,41 +111,22 @@ export default function ProductCard({ product, isNew }: ProductCardProps) {
         </h3>
       </Link>
 
-      {/* Clear Glass Inventory Stock Pill */}
+      {/* Inventory Stock Pill */}
       <div className="flex items-center min-h-6 mb-3">
-        <GlassSurface
-          borderRadius={9999}
-          borderWidth={0.07}
-          distortionScale={-180}
-          displace={0.5}
-          backgroundOpacity={0.1}
-          brightness={50}
-          opacity={0.93}
-          blur={11}
-          saturation={1}
-          redOffset={0}
-          greenOffset={10}
-          blueOffset={20}
-          refraction
-          renderer="auto"
-          className="shadow-xs"
-          contentClassName="relative z-[1] inline-flex items-center gap-1.5 px-3 py-1 text-[11px] font-black tracking-wider uppercase text-black"
-        >
-          {isOutOfStock ? (
-            <>
-              <span className="w-2 h-2 rounded-full bg-zinc-400" />
-              <span className="text-zinc-500">OUT OF STOCK</span>
-            </>
-          ) : (
-            <>
-              <span className="w-2 h-2 rounded-full bg-black" />
-              <span>{stock <= 10 ? `ONLY ${stock} LEFT` : "IN STOCK"}</span>
-            </>
-          )}
-        </GlassSurface>
+        {isOutOfStock ? (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-100 text-zinc-600 text-[11px] font-black tracking-wider uppercase border border-zinc-200">
+            <span className="w-2 h-2 rounded-full bg-zinc-400" />
+            OUT OF STOCK
+          </span>
+        ) : (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#ffce27] text-black text-[11px] font-black tracking-wider uppercase shadow-xs">
+            <span className="w-2 h-2 rounded-full bg-black" />
+            {stock <= 10 ? `ONLY ${stock} LEFT` : "IN STOCK"}
+          </span>
+        )}
       </div>
 
-      {/* Bottom Action Row: Bold Price (Left) + Clear Glass Cart Button (Right) */}
+      {/* Bottom Action Row: Bold Price (Left) + Yellow Cart Button (Right) */}
       <div className="flex items-center justify-between gap-3 mt-auto pt-2">
         <div className="flex flex-col">
           <span className="text-xl sm:text-2xl font-black text-black tracking-tight leading-none">
@@ -168,47 +148,27 @@ export default function ProductCard({ product, isNew }: ProductCardProps) {
               ? `${product.name} is out of stock`
               : `Quick buy ${product.name}`
           }
-          className={`relative rounded-full shrink-0 transition-all touch-manipulation cursor-pointer ${
+          className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 transition-all touch-manipulation cursor-pointer ${
             isOutOfStock
-              ? "opacity-40 cursor-not-allowed"
-              : "hover:scale-105 active:scale-95 shadow-[0_4px_16px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)]"
+              ? "bg-zinc-200 text-zinc-400 cursor-not-allowed"
+              : "bg-[#ffce27] text-black shadow-[0_8px_20px_rgba(255,206,39,0.7)] hover:scale-105 active:scale-95"
           }`}
         >
-          <GlassSurface
-            width={48}
-            height={48}
-            borderRadius={24}
-            borderWidth={0.07}
-            distortionScale={-180}
-            displace={0.5}
-            backgroundOpacity={0.1}
-            brightness={50}
-            opacity={0.93}
-            blur={11}
-            saturation={1}
-            redOffset={0}
-            greenOffset={10}
-            blueOffset={20}
-            refraction
-            renderer="auto"
-            contentClassName="relative z-[1] flex items-center justify-center w-full h-full text-black"
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="pointer-events-none"
           >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="pointer-events-none"
-            >
-              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
-              <line x1="3" y1="6" x2="21" y2="6" />
-              <path d="M16 10a4 4 0 0 1-8 0" />
-            </svg>
-          </GlassSurface>
+            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <path d="M16 10a4 4 0 0 1-8 0" />
+          </svg>
         </button>
       </div>
     </div>
