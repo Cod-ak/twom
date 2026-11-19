@@ -1,16 +1,19 @@
 "use client";
 
 import { useCartStore } from "@/lib/store";
+import { useUIStore } from "@/lib/ui-store";
 import { Product } from "@/lib/types";
 import { useState } from "react";
 
 export default function AddToCartButton({ product }: { product: Product }) {
   const addItem = useCartStore((state) => state.addItem);
+  const openCart = useUIStore((state) => state.openCart);
   const [isAdded, setIsAdded] = useState(false);
 
   const handleAddToCart = () => {
     addItem(product);
     setIsAdded(true);
+    openCart();
     setTimeout(() => setIsAdded(false), 2000);
   };
 

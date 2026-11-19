@@ -36,6 +36,7 @@ create table public.products (
   category text not null,
   price integer not null check (price >= 0), -- In Kobo
   image_url text not null,
+  images text[] default '{}',
   stock_quantity integer not null default 0 check (stock_quantity >= 0),
   is_active boolean not null default true,
   created_at timestamptz not null default now()

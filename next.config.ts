@@ -8,10 +8,26 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "wygcegdwyaajxzjkczis.supabase.co", 
       },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
     ],
+  },
+  async redirects() {
+    return [
+      {
+        source: "/cart",
+        destination: "/?openCart=true",
+        permanent: false,
+      },
+    ];
   },
   experimental: {
     agentFeedback: true,
+    serverActions: {
+      bodySizeLimit: "10mb",
+    },
   },
   cacheComponents: true,
   partialPrefetching: true,

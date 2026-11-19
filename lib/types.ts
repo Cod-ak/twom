@@ -22,9 +22,11 @@ export interface Product {
   category: ProductCategory | string;
   price: number;           // Integer in Kobo
   image_url: string;
+  images?: string[];       // Array of gallery image URLs
   stock_quantity: number;
   is_active: boolean;
   created_at: string;
+  is_new?: boolean;
 }
 
 export type OrderStatus = "pending" | "paid" | "shipped" | "cancelled" | "failed";

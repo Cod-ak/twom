@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Product } from "@/lib/types";
 import ProductCard from "@/components/ProductCard";
+import GlassSurface from "@/components/GlassSurface";
 import {
   ShowcaseItem,
   matchesCategoryTab,
@@ -35,30 +36,46 @@ export default function CategoryShowcase({
 
   return (
     <section className="w-full max-w-7xl mx-auto px-4 md:px-6 pt-4 pb-0 md:py-20">
-      {/* Category Tabs Header */}
-      <div className="flex items-center gap-6 md:gap-10 mb-4 md:mb-12">
-        {tabs.map((tab) => (
-          <button
-            key={tab}
-            type="button"
-            onClick={() => setActiveTab(tab)}
-            className={`font-nippo italic uppercase text-lg md:text-2xl tracking-wider transition-colors cursor-pointer ${
-              activeTab === tab
-                ? "font-black text-black"
-                : "font-black text-zinc-300 hover:text-zinc-600"
-            }`}
-          >
-            {tab}
-          </button>
-        ))}
+      {/* Liquid Glass Category Switcher Dock */}
+      <div className="flex items-center mb-6 md:mb-10">
+        <GlassSurface
+          borderRadius={9999}
+          borderWidth={0.07}
+          distortionScale={-110}
+          displace={0.4}
+          backgroundOpacity={0.12}
+          redOffset={0}
+          greenOffset={8}
+          blueOffset={16}
+          className="shadow-sm"
+          contentClassName="relative z-1 inline-flex items-center p-1.5 rounded-full gap-1 sm:gap-2"
+        >
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab;
+            return (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => setActiveTab(tab)}
+                className={`relative px-4 sm:px-6 py-2 sm:py-2.5 rounded-full font-nippo italic uppercase text-xs sm:text-sm md:text-base tracking-wider transition-all duration-300 cursor-pointer ${
+                  isActive
+                    ? "liquid-glass-pill text-twom-title font-black shadow-[0_4px_12px_rgba(0,0,0,0.06)]"
+                    : "text-zinc-600 hover:text-twom-title font-bold hover:bg-white/40"
+                }`}
+              >
+                {tab}
+              </button>
+            );
+          })}
+        </GlassSurface>
       </div>
 
       {/* Horizontal Scrollable Product Carousel */}
-      <div className="flex items-stretch gap-4 md:gap-6 overflow-x-auto no-scrollbar snap-x snap-mandatory scroll-px-4 -mx-4 px-4 md:scroll-px-0 md:mx-0 md:px-0 pb-4 md:pb-6">
+      <div className="flex items-stretch gap-4 md:gap-6 overflow-x-auto no-scrollbar snap-x snap-mandatory scroll-px-4 md:scroll-px-0 -mx-4 px-4 md:mx-0 md:px-0 pb-2">
         {displayedItems.map((item) => (
           <div
             key={item.id}
-            className="w-[76vw] min-w-[76vw] sm:w-[48vw] sm:min-w-[48vw] md:w-[calc(25%-18px)] md:min-w-[calc(25%-18px)] shrink-0 snap-start flex flex-col h-full"
+            className="w-[76vw] min-w-[76vw] sm:w-[46vw] sm:min-w-[46vw] md:w-[calc(25%-18px)] md:min-w-[calc(25%-18px)] shrink-0 snap-start flex flex-col h-full"
           >
             <ProductCard product={item} />
           </div>

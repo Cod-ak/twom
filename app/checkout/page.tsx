@@ -5,7 +5,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/lib/store";
+import { useUIStore } from "@/lib/ui-store";
 import { formatNaira } from "@/lib/utils";
+
+export const instant = false;
 
 const emptySubscribe = () => () => {};
 
@@ -17,7 +20,8 @@ export default function CheckoutPage() {
     () => false
   );
 
-  const { items, removeItem, clearCart } = useCartStore();
+  const { items, discount, removeItem, clearCart } = useCartStore();
+  const openCart = useUIStore((state) => state.openCart);
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [invalidIssues, setInvalidIssues] = useState<Record<string, string>>({});
@@ -32,6 +36,11 @@ export default function CheckoutPage() {
     (total, item) => total + item.price * item.quantity,
     0
   );
+
+  const discountAmount = discount
+    ? Math.round(subtotal * (discount.percent / 100))
+    : 0;
+  const finalTotal = Math.max(0, subtotal - discountAmount);
 
   const hasInvalidItems = Object.keys(invalidIssues).length > 0;
 
@@ -91,6 +100,7 @@ export default function CheckoutPage() {
             id: item.id,
             quantity: item.quantity,
           })),
+          discountCode: discount?.code,
         }),
       });
 
@@ -148,12 +158,13 @@ export default function CheckoutPage() {
     <div className="min-h-screen bg-twom-bg pt-32 pb-24 px-6 md:px-12">
       <div className="max-w-5xl mx-auto">
         <div className="mb-10 pb-6 border-b border-zinc-200">
-          <Link
-            href="/cart"
-            className="text-xs uppercase tracking-wider text-twom-muted hover:text-twom-title transition-colors"
+          <button
+            type="button"
+            onClick={() => openCart()}
+            className="text-xs uppercase tracking-wider text-twom-muted hover:text-twom-title transition-colors cursor-pointer"
           >
             ← Back to Bag
-          </Link>
+          </button>
           <h1 className="font-zodiak text-4xl text-twom-title mt-2">
             Secure Checkout
           </h1>
@@ -254,7 +265,7 @@ export default function CheckoutPage() {
                     ? "Connecting to Payment Gateway..."
                     : hasInvalidItems
                     ? "Remove unavailable piece(s) to continue"
-                    : `Pay ${formatNaira(subtotal)} with Paystack`}
+                    : `Pay ${formatNaira(finalTotal)} with Paystack`}
                 </button>
                 <p className="text-[11px] text-zinc-400 text-center mt-3">
                   Secured by 256-bit SSL encryption via Paystack.
@@ -371,6 +382,12 @@ export default function CheckoutPage() {
                   <span>Subtotal</span>
                   <span>{formatNaira(subtotal)}</span>
                 </div>
+                {discount && (
+                  <div className="flex justify-between text-emerald-600 font-medium">
+                    <span>Discount ({discount.percent}%)</span>
+                    <span>-{formatNaira(discountAmount)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-twom-muted">
                   <span>Standard Shipping</span>
                   <span className="text-zinc-500 font-mono text-[11px]">
@@ -380,7 +397,7 @@ export default function CheckoutPage() {
                 <div className="border-t border-zinc-200 pt-4 mt-2 flex justify-between items-center text-sm font-medium text-twom-title">
                   <span>Total Amount</span>
                   <span className="font-zodiak text-2xl">
-                    {formatNaira(subtotal)}
+                    {formatNaira(finalTotal)}
                   </span>
                 </div>
               </div>

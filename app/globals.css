@@ -9,26 +9,26 @@ html {
 }
 
 :root {
-  --base-100: #f0eeee;
+  --base-100: #f6f5f1;
   --base-200: #a374ff;
   --base-300: #222225;
-  --background: oklch(1 0 0);
+  --background: #f6f5f1;
   --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
+  --card: #ffffff;
   --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
+  --popover: #ffffff;
   --popover-foreground: oklch(0.145 0 0);
   --primary: oklch(0.205 0 0);
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
+  --secondary: #edebe4;
   --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
+  --muted: #edebe4;
   --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
+  --accent: #edebe4;
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
+  --border: #e6e4dc;
+  --input: #e6e4dc;
   --ring: oklch(0.708 0 0);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
@@ -36,13 +36,13 @@ html {
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
+  --sidebar: #f6f5f1;
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent: #edebe4;
   --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-border: #e6e4dc;
   --sidebar-ring: oklch(0.708 0 0);
 }
 img {
@@ -55,12 +55,12 @@ img {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 
-  /* Brand Custom Colors */
-  --color-twom-bg: #ffffff;
+  /* Brand Custom Colors (Warm Editorial Studio / Chalk / Bone Palette) */
+  --color-twom-bg: #f6f5f1;
   --color-twom-title: #101828;
   --color-twom-body: #344054;
   --color-twom-muted: #667085;
-  --color-twom-border: #d0d5dd;
+  --color-twom-border: #e6e4dc;
   --color-twom-dark: #111111;
 
   /* Custom Brand Fonts */
@@ -187,4 +187,280 @@ button {
   html {
     @apply font-sans;
   }
+}
+
+/* ==========================================================================
+   Liquid Glass & Specular Sheen System
+   ========================================================================== */
+
+.liquid-glass {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.78) 0%,
+    rgba(255, 255, 255, 0.54) 35%,
+    rgba(255, 255, 255, 0.44) 65%,
+    rgba(255, 255, 255, 0.7) 100%
+  );
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow:
+    0 20px 40px -15px rgba(16, 24, 40, 0.07),
+    0 1px 3px 0 rgba(0, 0, 0, 0.04),
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 2px 0 rgba(0, 0, 0, 0.03);
+}
+
+/* Signature TWOM Yellow Liquid Amber Glass (Option B: Bold Liquid Gold Acrylic) */
+.liquid-glass-yellow {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 224, 88, 0.95) 0%,
+    rgba(255, 206, 39, 0.90) 35%,
+    rgba(246, 196, 20, 0.86) 65%,
+    rgba(255, 216, 62, 0.93) 100%
+  );
+  backdrop-filter: blur(28px) saturate(220%);
+  -webkit-backdrop-filter: blur(28px) saturate(220%);
+  border: 1px solid rgba(255, 255, 255, 0.88);
+  box-shadow:
+    0 24px 48px -12px rgba(180, 130, 0, 0.28),
+    0 2px 6px 0 rgba(0, 0, 0, 0.08),
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.98),
+    inset 0 -2px 3px 0 rgba(160, 110, 0, 0.2);
+}
+
+/* Smoked Obsidian Liquid Glass (Black Background + White Text + Specular Rim) */
+.liquid-glass-black {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    rgba(24, 24, 28, 0.92) 0%,
+    rgba(12, 12, 15, 0.88) 35%,
+    rgba(6, 6, 8, 0.84) 65%,
+    rgba(18, 18, 22, 0.90) 100%
+  );
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow:
+    0 24px 48px -12px rgba(0, 0, 0, 0.5),
+    0 2px 6px 0 rgba(0, 0, 0, 0.3),
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -1.5px 2px 0 rgba(0, 0, 0, 0.7);
+}
+
+/* Subtle angled specular sheen (always visible physical refraction across the surface) */
+.liquid-glass-sheen {
+  position: relative;
+  overflow: hidden;
+}
+
+.liquid-glass-sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    125deg,
+    rgba(255, 255, 255, 0.45) 0%,
+    rgba(255, 255, 255, 0.14) 30%,
+    rgba(255, 255, 255, 0) 52%,
+    rgba(255, 255, 255, 0.06) 75%,
+    rgba(255, 255, 255, 0.22) 100%
+  );
+  z-index: 1;
+}
+
+/* Tactile liquid glass pill (for price capsules, badges, and segmented tab dock) */
+.liquid-glass-pill {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.70) 0%,
+    rgba(255, 255, 255, 0.40) 100%
+  );
+  backdrop-filter: blur(20px) saturate(190%);
+  -webkit-backdrop-filter: blur(20px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow:
+    0 4px 14px -2px rgba(0, 0, 0, 0.08),
+    0 1px 2px 0 rgba(0, 0, 0, 0.04),
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.98),
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.04);
+}
+
+button.liquid-glass-pill:hover:not(:disabled) {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.88) 0%,
+    rgba(255, 255, 255, 0.58) 100%
+  );
+  box-shadow:
+    0 6px 18px -2px rgba(0, 0, 0, 0.12),
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.03);
+}
+
+/* Translucent smoked pill (for price capsules on dark glass) */
+.liquid-glass-pill-dark {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.14) 0%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow:
+    0 2px 8px -2px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0.8px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -0.8px 1px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* Obsidian liquid glass (for dark action buttons, high contrast pills) */
+.liquid-glass-dark {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    rgba(22, 22, 26, 0.94) 0%,
+    rgba(10, 10, 14, 0.86) 100%
+  );
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow:
+    0 6px 16px -4px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0.8px 0 rgba(255, 255, 255, 0.32),
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Frosted Glass Showcase Tray (Milky / Etched Glass) */
+.frosted-showcase-tray {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.72) 0%,
+    rgba(255, 255, 255, 0.42) 35%,
+    rgba(250, 250, 252, 0.32) 70%,
+    rgba(255, 255, 255, 0.60) 100%
+  );
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.90);
+  box-shadow:
+    0 24px 60px -15px rgba(16, 24, 40, 0.08),
+    0 4px 16px -2px rgba(16, 24, 40, 0.03),
+    inset 0 2px 1.5px 0 rgba(255, 255, 255, 1),
+    inset 0 -1.5px 2px 0 rgba(0, 0, 0, 0.02);
+}
+
+/* Clear Glass Showcase Tray (Ultra-Transparent Crystal Glass / Acrylic Stage) */
+.clear-glass-tray {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.25) 0%,
+    rgba(255, 255, 255, 0.08) 35%,
+    rgba(255, 255, 255, 0.04) 70%,
+    rgba(255, 255, 255, 0.18) 100%
+  );
+  backdrop-filter: blur(8px) saturate(140%);
+  -webkit-backdrop-filter: blur(8px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow:
+    0 20px 50px -15px rgba(0, 0, 0, 0.05),
+    0 4px 16px -2px rgba(0, 0, 0, 0.02),
+    inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 1.5px 0 rgba(0, 0, 0, 0.03);
+}
+
+/* Dark mode adjustments */
+.dark .liquid-glass {
+  background: linear-gradient(
+    135deg,
+    rgba(32, 32, 38, 0.78) 0%,
+    rgba(18, 18, 24, 0.55) 35%,
+    rgba(14, 14, 18, 0.45) 65%,
+    rgba(28, 28, 34, 0.7) 100%
+  );
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow:
+    0 20px 40px -15px rgba(0, 0, 0, 0.4),
+    0 1px 3px 0 rgba(0, 0, 0, 0.25),
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -1.5px 2px 0 rgba(0, 0, 0, 0.3);
+}
+
+.dark .liquid-glass-sheen::after {
+  background: linear-gradient(
+    125deg,
+    rgba(255, 255, 255, 0.16) 0%,
+    rgba(255, 255, 255, 0.04) 35%,
+    rgba(255, 255, 255, 0) 55%,
+    rgba(255, 255, 255, 0.06) 100%
+  );
+}
+
+.dark .liquid-glass-pill {
+  background: linear-gradient(
+    135deg,
+    rgba(45, 45, 52, 0.85) 0%,
+    rgba(28, 28, 34, 0.65) 100%
+  );
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #f3f4f6;
+  box-shadow:
+    0 2px 8px -2px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0.8px 0 rgba(255, 255, 255, 0.3);
+}
+
+.dark .liquid-glass-yellow {
+  background: linear-gradient(
+    135deg,
+    rgba(235, 185, 30, 0.92) 0%,
+    rgba(205, 155, 18, 0.86) 35%,
+    rgba(175, 128, 10, 0.82) 65%,
+    rgba(225, 175, 25, 0.90) 100%
+  );
+  border-color: rgba(255, 240, 150, 0.4);
+  box-shadow:
+    0 24px 48px -12px rgba(0, 0, 0, 0.6),
+    0 2px 6px 0 rgba(0, 0, 0, 0.35),
+    inset 0 1.5px 1px 0 rgba(255, 250, 200, 0.5),
+    inset 0 -2px 3px 0 rgba(0, 0, 0, 0.5);
+}
+
+.dark .frosted-showcase-tray {
+  background: linear-gradient(
+    135deg,
+    rgba(32, 32, 38, 0.70) 0%,
+    rgba(20, 20, 26, 0.50) 35%,
+    rgba(14, 14, 18, 0.40) 70%,
+    rgba(28, 28, 34, 0.60) 100%
+  );
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow:
+    0 24px 60px -15px rgba(0, 0, 0, 0.55),
+    inset 0 2px 1.5px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1.5px 2px 0 rgba(0, 0, 0, 0.4);
+}
+
+.dark .clear-glass-tray {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.02) 40%,
+    rgba(255, 255, 255, 0.01) 70%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow:
+    0 24px 60px -15px rgba(0, 0, 0, 0.5),
+    inset 0 1.5px 1.2px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -1px 1.5px 0 rgba(0, 0, 0, 0.35);
 }

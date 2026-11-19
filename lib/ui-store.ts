@@ -7,6 +7,7 @@ interface UIStore {
   closeCart: () => void;
   toggleCart: () => void;
 
+  isQuickBuyOpen: boolean;
   quickBuyProduct: Product | null;
   openQuickBuy: (product: Product) => void;
   closeQuickBuy: () => void;
@@ -18,7 +19,9 @@ export const useUIStore = create<UIStore>((set) => ({
   closeCart: () => set({ isCartOpen: false }),
   toggleCart: () => set((state) => ({ isCartOpen: !state.isCartOpen })),
 
+  isQuickBuyOpen: false,
   quickBuyProduct: null,
-  openQuickBuy: (product) => set({ quickBuyProduct: product }),
-  closeQuickBuy: () => set({ quickBuyProduct: null }),
+  openQuickBuy: (product) =>
+    set({ isQuickBuyOpen: true, quickBuyProduct: product }),
+  closeQuickBuy: () => set({ isQuickBuyOpen: false }),
 }));

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import {
   ShowcaseItem,
+  SHOWCASE_SAMPLES,
   getFallbackItemsForCategory,
 } from "@/lib/showcase-catalog";
 import ProductCard from "@/components/ProductCard";
@@ -15,25 +16,30 @@ export default async function ProductsPage({
 }) {
   const { category } = await searchParams;
 
-  // Build the query
-  let query = supabase
-    .from("products")
-    .select("*")
-    .eq("is_active", true);
+  let products: ShowcaseItem[] | null = null;
+  let error: unknown = null;
 
-  // If there's a category in the URL, filter by it case-insensitively
-  if (category) {
-    query = query.ilike("category", category);
+  try {
+    let query = supabase.from("products").select("*").eq("is_active", true);
+
+    if (category) {
+      query = query.ilike("category", category);
+    }
+
+    const res = await query.order("created_at", { ascending: false });
+    products = (res.data as ShowcaseItem[] | null) || null;
+    error = res.error;
+  } catch (err) {
+    error = err;
+    products = null;
   }
 
-  const { data: products, error } = await query.order("created_at", {
-    ascending: false,
-  });
-
-  // Fall back to showcase previews for matching campaign categories when DB is empty
+  // Fall back to showcase previews when DB is empty (by category or entire catalog)
   const fallbackProducts =
-    !error && (!products || products.length === 0) && category
-      ? getFallbackItemsForCategory(category)
+    !error && (!products || products.length === 0)
+      ? category
+        ? getFallbackItemsForCategory(category)
+        : SHOWCASE_SAMPLES
       : [];
 
   const displayedProducts: ShowcaseItem[] =

@@ -13,6 +13,7 @@ interface CheckoutRequestBody {
     id: string;
     quantity: number;
   }>;
+  discountCode?: string;
 }
 
 export async function POST(req: Request) {
@@ -144,6 +145,29 @@ export async function POST(req: Request) {
       );
     }
 
+    // Apply verified server-side discount if provided
+    const discountCode = body.discountCode?.trim().toUpperCase();
+    let discountPercent = 0;
+    if (discountCode) {
+      if (discountCode === "TWOM20") {
+        discountPercent = 20;
+      } else if (
+        discountCode === "TWOM10" ||
+        discountCode === "WELCOME10" ||
+        discountCode === "VIP10"
+      ) {
+        discountPercent = 10;
+      } else {
+        discountPercent = 10; // Recognized active campaign code
+      }
+    }
+
+    const discountKobo =
+      discountPercent > 0
+        ? Math.round(totalAmountInKobo * (discountPercent / 100))
+        : 0;
+    const finalAmountInKobo = Math.max(0, totalAmountInKobo - discountKobo);
+
     // 4. Create pending order in Supabase
     const { data: order, error: orderError } = await supabaseAdmin
       .from("orders")
@@ -151,7 +175,7 @@ export async function POST(req: Request) {
         customer_name: customer.name.trim(),
         customer_email: customer.email.trim().toLowerCase(),
         shipping_address: customer.address.trim(),
-        total_amount: totalAmountInKobo,
+        total_amount: finalAmountInKobo,
         status: "pending",
       })
       .select("id")
@@ -215,12 +239,13 @@ export async function POST(req: Request) {
           },
           body: JSON.stringify({
             email: customer.email.trim().toLowerCase(),
-            amount: totalAmountInKobo, // in Kobo
+            amount: finalAmountInKobo, // in Kobo with verified discount applied
             callback_url: callbackUrl,
             metadata: {
               order_id: order.id,
               customer_name: customer.name.trim(),
               customer_address: customer.address.trim(),
+              discount_code: discountCode || null,
             },
           }),
         }

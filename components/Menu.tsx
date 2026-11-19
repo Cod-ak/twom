@@ -66,7 +66,7 @@ export default function Menu() {
   const isCartOpen = useUIStore((state) => state.isCartOpen);
   const openCart = useUIStore((state) => state.openCart);
   const closeCart = useUIStore((state) => state.closeCart);
-  const quickBuyProduct = useUIStore((state) => state.quickBuyProduct);
+  const isQuickBuyOpen = useUIStore((state) => state.isQuickBuyOpen);
   const closeQuickBuy = useUIStore((state) => state.closeQuickBuy);
   const totalCount = mounted
     ? items.reduce((acc, item) => acc + item.quantity, 0)
@@ -262,14 +262,14 @@ export default function Menu() {
   const toggleMenu = useCallback(() => {
     if (isAnimating.current) return;
     if (isCartOpen) closeCart();
-    if (quickBuyProduct) closeQuickBuy();
+    if (isQuickBuyOpen) closeQuickBuy();
     isAnimating.current = true;
     if (isOpen) closeMenu();
     else openMenu();
-  }, [isOpen, isCartOpen, quickBuyProduct, closeCart, closeQuickBuy, closeMenu, openMenu]);
+  }, [isOpen, isCartOpen, isQuickBuyOpen, closeCart, closeQuickBuy, closeMenu, openMenu]);
 
   const handleCartClick = useCallback(() => {
-    if (quickBuyProduct) closeQuickBuy();
+    if (isQuickBuyOpen) closeQuickBuy();
     if (isOpen && !isAnimating.current) {
       isAnimating.current = true;
       closeMenu();
@@ -279,16 +279,16 @@ export default function Menu() {
     } else {
       openCart();
     }
-  }, [isOpen, isCartOpen, quickBuyProduct, closeCart, openCart, closeQuickBuy, closeMenu]);
+  }, [isOpen, isCartOpen, isQuickBuyOpen, closeCart, openCart, closeQuickBuy, closeMenu]);
 
   const handleLogoClick = useCallback(() => {
     if (isCartOpen) closeCart();
-    if (quickBuyProduct) closeQuickBuy();
+    if (isQuickBuyOpen) closeQuickBuy();
     if (isOpen && !isAnimating.current) {
       isAnimating.current = true;
       closeMenu();
     }
-  }, [isOpen, isCartOpen, quickBuyProduct, closeCart, closeQuickBuy, closeMenu]);
+  }, [isOpen, isCartOpen, isQuickBuyOpen, closeCart, closeQuickBuy, closeMenu]);
 
   // Lock background scroll when menu is open
   useScrollLock("menu", isOpen);
@@ -441,9 +441,16 @@ export default function Menu() {
           <Link href="/products?category=Essentials" onClick={toggleMenu}>
             Essentials
           </Link>
-          <Link href="/cart" onClick={toggleMenu}>
+          <button
+            type="button"
+            onClick={() => {
+              toggleMenu();
+              openCart();
+            }}
+            className="text-left cursor-pointer hover:opacity-70 transition-opacity font-inherit text-inherit"
+          >
             Your Cart
-          </Link>
+          </button>
           <Link href="/story" onClick={toggleMenu}>
             The World
           </Link>

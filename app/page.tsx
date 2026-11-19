@@ -2,9 +2,9 @@ import Hero from "../components/Hero";
 import ProductCard from "../components/ProductCard";
 import EditorialCampaignBanners from "../components/EditorialCampaignBanners";
 import CategoryShowcase from "../components/CategoryShowcase";
-import MicroSlatsSection from "../components/MicroSlatsSection";
 import { supabase } from "../lib/supabase";
 import { Product } from "../lib/types";
+import { SAMPLE_TEES } from "../lib/showcase-catalog";
 
 export const instant = false;
 export default async function Home() {
@@ -22,6 +22,9 @@ export default async function Home() {
   } catch {
     // If database is not configured in preview, showcases fall back gracefully
   }
+
+  const featuredProducts =
+    products.length > 0 ? products.slice(0, 4) : (SAMPLE_TEES.slice(0, 4) as Product[]);
 
   return (
     <div className="w-full bg-twom-bg text-twom-body">
@@ -52,90 +55,75 @@ export default async function Home() {
         </div>
       </div>
 
-      {/* Featured Pieces — MicroSlats background */}
-      <MicroSlatsSection>
-        <section
-          id="collection"
-          className="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-27 border-t border-twom-border/40"
-        >
-          {/* Mobile Horizontal Carousel & Desktop Grid */}
-          <div className="flex items-stretch md:grid md:grid-cols-2 gap-4 md:gap-6 overflow-x-auto md:overflow-visible snap-x snap-mandatory scroll-px-4 no-scrollbar -mx-4 px-4 md:scroll-px-0 md:mx-0 md:px-0">
-            {products?.slice(0, 4).map((product: Product, index: number) => (
-              <div
-                key={product.id}
-                className="w-[68vw] min-w-[68vw] sm:w-[48vw] sm:min-w-[48vw] shrink-0 snap-start md:w-auto md:min-w-0 md:shrink flex flex-col h-full"
-              >
-                <ProductCard product={product} isNew={index === 0} />
-              </div>
-            ))}
-          </div>
-        </section>
-      </MicroSlatsSection>
+      {/* Featured Pieces Selection */}
+      <section
+        id="collection"
+        className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-16"
+      >
+        {/* Mobile Horizontal Carousel & Desktop Grid */}
+        <div className="flex items-stretch md:grid md:grid-cols-2 gap-4 md:gap-6 overflow-x-auto md:overflow-visible snap-x snap-mandatory scroll-px-4 no-scrollbar -mx-4 px-4 md:scroll-px-0 md:mx-0 md:px-0 pb-2">
+          {featuredProducts.map((product: Product) => (
+            <div
+              key={product.id}
+              className="w-[72vw] min-w-[72vw] sm:w-[48vw] sm:min-w-[48vw] shrink-0 snap-start md:w-auto md:min-w-0 md:shrink flex flex-col h-full"
+            >
+              <ProductCard product={product} />
+            </div>
+          ))}
+        </div>
+      </section>
+      {/* Set 1: Editorial Campaign Banners (Tees & Tanks, Pants) */}
+      <EditorialCampaignBanners />
 
-      {/* Set 1: Editorial Campaign Banners (Tees & Tanks, Pants) — MicroSlats background */}
-      <MicroSlatsSection>
-        <EditorialCampaignBanners />
-      </MicroSlatsSection>
+      {/* Set 1: Interactive Category Showcase (Tees & Tanks, Pants) */}
+      <CategoryShowcase
+        dbProducts={products || []}
+        tabs={["TEES & TANKS", "PANTS"]}
+      />
 
-      {/* Set 1: Interactive Category Showcase (Tees & Tanks, Pants) — MicroSlats background */}
-      <MicroSlatsSection>
-        <CategoryShowcase
-          dbProducts={products || []}
-          tabs={["TEES & TANKS", "PANTS"]}
-        />
-      </MicroSlatsSection>
+      {/* Set 2: Editorial Campaign Banners (Hoodies, Accessories) */}
+      <EditorialCampaignBanners
+        banner1={{
+          title: "Hoodies",
+          image: "/TWOM.png",
+          link: "/products?category=Hoodies",
+          priority: false,
+        }}
+        banner2={{
+          title: "Accessories",
+          image: "/TWOM.png",
+          link: "/products?category=Accessories",
+          priority: false,
+        }}
+      />
 
-      {/* Set 2: Editorial Campaign Banners (Hoodies, Accessories) — MicroSlats background */}
-      <MicroSlatsSection>
-        <EditorialCampaignBanners
-          banner1={{
-            title: "Hoodies",
-            image: "/TWOM.png",
-            link: "/products?category=Hoodies",
-            priority: false,
-          }}
-          banner2={{
-            title: "Accessories",
-            image: "/TWOM.png",
-            link: "/products?category=Accessories",
-            priority: false,
-          }}
-        />
-      </MicroSlatsSection>
+      {/* Set 2: Interactive Category Showcase (Hoodies, Accessories) */}
+      <CategoryShowcase
+        dbProducts={products || []}
+        tabs={["HOODIES", "ACCESSORIES"]}
+      />
 
-      {/* Set 2: Interactive Category Showcase (Hoodies, Accessories) — MicroSlats background */}
-      <MicroSlatsSection>
-        <CategoryShowcase
-          dbProducts={products || []}
-          tabs={["HOODIES", "ACCESSORIES"]}
-        />
-      </MicroSlatsSection>
+      {/* Set 3: Editorial Campaign Banners (Shirts, Anime) */}
+      <EditorialCampaignBanners
+        banner1={{
+          title: "Shirts",
+          image: "/TWOM.png",
+          link: "/products?category=Shirts",
+          priority: false,
+        }}
+        banner2={{
+          title: "Anime",
+          image: "/TWOM.png",
+          link: "/products?category=Anime",
+          priority: false,
+        }}
+      />
 
-      {/* Set 3: Editorial Campaign Banners (Shirts, Anime) — MicroSlats background */}
-      <MicroSlatsSection>
-        <EditorialCampaignBanners
-          banner1={{
-            title: "Shirts",
-            image: "/TWOM.png",
-            link: "/products?category=Shirts",
-            priority: false,
-          }}
-          banner2={{
-            title: "Anime",
-            image: "/TWOM.png",
-            link: "/products?category=Anime",
-            priority: false,
-          }}
-        />
-      </MicroSlatsSection>
-
-      {/* Set 3: Interactive Category Showcase (Shirts, Anime) — MicroSlats background */}
-      <MicroSlatsSection>
-        <CategoryShowcase
-          dbProducts={products || []}
-          tabs={["SHIRTS", "ANIME"]}
-        />
-      </MicroSlatsSection>
+      {/* Set 3: Interactive Category Showcase (Shirts, Anime) */}
+      <CategoryShowcase
+        dbProducts={products || []}
+        tabs={["SHIRTS", "ANIME"]}
+      />
     </div>
   );
 }

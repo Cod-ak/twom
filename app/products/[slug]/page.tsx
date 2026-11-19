@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { formatNaira } from "@/lib/utils";
@@ -10,6 +9,7 @@ import {
   isSampleProductId,
 } from "@/lib/showcase-catalog";
 import AddToCartButton from "@/components/AddToCartButton";
+import ProductImageGallery from "@/components/ProductImageGallery";
 
 export const instant = false;
 
@@ -40,36 +40,20 @@ export default async function ProductPage({
   }
 
   const isSample = isSampleProductId(product.id);
-  const isLogoPlaceholder =
-    !product.image_url ||
-    product.image_url.includes("TWOM.png") ||
-    product.image_url.includes("Twom.png");
 
   return (
     <div className="w-full min-h-screen bg-twom-bg pt-32 pb-24 px-6 md:px-12">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-12 lg:gap-24">
-        {/* Left Column: Image */}
+        {/* Left Column: Swipeable Product Image Gallery */}
         <div className="w-full md:w-1/2">
-          <div className="relative aspect-3/4 w-full overflow-hidden bg-zinc-100">
-            {product.image_url ? (
-              <Image
-                src={product.image_url}
-                alt={product.name}
-                fill
-                priority
-                sizes="(max-width: 768px) 100vw, 50vw"
-                className={
-                  isLogoPlaceholder
-                    ? "object-contain p-12"
-                    : "object-cover object-center"
-                }
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-xs uppercase tracking-widest text-twom-muted">
-                No Image
-              </div>
-            )}
-          </div>
+          <ProductImageGallery
+            images={
+              product.images && product.images.length > 0
+                ? product.images
+                : [product.image_url]
+            }
+            name={product.name}
+          />
         </div>
 
         {/* Right Column: Details */}

@@ -1,5 +1,6 @@
 "use client";
 
+import { useSyncExternalStore } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Product } from "@/lib/types";
@@ -21,6 +22,31 @@ export default function ProductCard({ product, isNew }: ProductCardProps) {
     typeof product.stock_quantity === "number" ? product.stock_quantity : 999;
   const isOutOfStock = stock <= 0;
 
+  // Automated "NEW" badge logic:
+  // 1. Explicit prop `isNew` (if passed as boolean)
+  // 2. Database boolean `product.is_new`
+  // 3. Fallback: created within the last 14 days (safe hydration / compiler-pure check)
+  const isItemNew = useSyncExternalStore(
+    () => () => {},
+    () => {
+      if (typeof isNew === "boolean") return isNew;
+      if (typeof product.is_new === "boolean") return product.is_new;
+      if (product.created_at) {
+        const createdTime = new Date(product.created_at).getTime();
+        if (!Number.isNaN(createdTime)) {
+          const FOURTEEN_DAYS_MS = 14 * 24 * 60 * 60 * 1000;
+          return Date.now() - createdTime <= FOURTEEN_DAYS_MS;
+        }
+      }
+      return false;
+    },
+    () => {
+      if (typeof isNew === "boolean") return isNew;
+      if (typeof product.is_new === "boolean") return product.is_new;
+      return false;
+    },
+  );
+
   const handleQuickBuy = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -31,9 +57,9 @@ export default function ProductCard({ product, isNew }: ProductCardProps) {
   const productHref = `/products/${product.slug || product.id}`;
 
   return (
-    <div className="group relative flex flex-col justify-between w-full h-full bg-white border border-zinc-200/80 rounded-3xl p-3 shadow-xs hover:shadow-md transition-shadow duration-300">
+    <div className="group relative flex flex-col justify-between w-full h-full bg-white rounded-[32px] sm:rounded-[36px] border-[3.5px] border-black p-3.5 sm:p-4 shadow-md hover:shadow-xl transition-all duration-300">
       {/* Inner Rounded Image Container */}
-      <div className="relative aspect-3/4 w-full overflow-hidden rounded-2xl bg-zinc-100 isolate">
+      <div className="relative aspect-[4/4.3] w-full overflow-hidden rounded-[22px] sm:rounded-[26px] bg-zinc-100 isolate">
         <Link
           href={productHref}
           className="relative block w-full h-full cursor-pointer"
@@ -49,68 +75,45 @@ export default function ProductCard({ product, isNew }: ProductCardProps) {
               }`}
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-xs uppercase tracking-widest text-twom-muted">
+            <div className="w-full h-full flex items-center justify-center text-xs uppercase tracking-widest text-zinc-400">
               No Image
             </div>
           )}
         </Link>
 
-        {/* Vertical Badge in Top-Right Position */}
-        {isOutOfStock ? (
-          <span className="pointer-events-none absolute top-0 right-0 z-1 bg-zinc-900/90 text-white text-[9px] font-bold tracking-widest px-1.5 py-2.5 [writing-mode:vertical-rl] select-none uppercase font-mono shadow-xs rounded-tr-2xl">
-            SOLD OUT
-          </span>
-        ) : product.saveBadge ? (
-          <span className="pointer-events-none absolute top-0 right-0 z-1 bg-[#c92a2a] text-white text-[9px] font-bold tracking-widest px-1.5 py-2.5 [writing-mode:vertical-rl] select-none uppercase font-mono shadow-xs rounded-tr-2xl">
-            {product.saveBadge}
-          </span>
-        ) : isNew ? (
-          <span className="pointer-events-none absolute top-0 right-0 z-1 bg-black text-white text-[10px] font-bold tracking-widest px-1.5 py-2.5 [writing-mode:vertical-rl] select-none uppercase rounded-tr-2xl">
+        {/* Vertical NEW Badge in Top-Right Position */}
+        {isItemNew && (
+          <span className="pointer-events-none absolute top-0 right-2 z-10 inline-flex items-center justify-center bg-[#ffce27] backdrop-blur-md border border-black/20 text-black text-xs sm:text-[13px] font-black tracking-[0.22em] px-2 sm:px-4 pt-2.5 sm:pt-3 pb-3 sm:pb-3.5 rounded-b-full rounded-t-none [writing-mode:vertical-rl] select-none uppercase shadow-sm">
             NEW
           </span>
-        ) : null}
+        )}
       </div>
 
-      {/* Product Title Only */}
+      {/* Product Title */}
       <Link
         href={productHref}
-        className="hover:opacity-75 transition-opacity block mt-3 mb-1.5"
+        className="hover:opacity-75 transition-opacity block mt-3.5 mb-2"
       >
-        <h3 className="text-sm font-medium text-twom-title leading-snug line-clamp-1">
+        <h3 className="text-lg sm:text-xl font-bold text-black leading-snug line-clamp-1 tracking-tight">
           {product.name}
         </h3>
       </Link>
 
-      {/* Inventory Stock Pill Slot - reserves space when stock > 10 so all cards have identical length */}
-      <div className="min-h-5.5 mb-2.5 flex items-center">
-        {stock <= 10 &&
-          (isOutOfStock ? (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono uppercase tracking-wider font-semibold bg-zinc-100 text-zinc-500 border border-zinc-200">
-              <span className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
-              Out of stock
+      {/* Bottom Action Row: Bold Price (Left) + Yellow Cart Button (Right) */}
+      <div className="flex items-center justify-between gap-3 mt-auto pt-3">
+        <div className="flex flex-col">
+          <span className="text-xl sm:text-2xl font-black text-black tracking-tight leading-none">
+            {formatNaira(product.price)}
+          </span>
+          {isOutOfStock ? (
+            <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 mt-1">
+              Sold Out
             </span>
-          ) : stock <= 5 ? (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono uppercase tracking-wider font-semibold bg-rose-50 text-rose-700 border border-rose-200/80">
-              <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
-              Only {stock} left
-            </span>
-          ) : (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono uppercase tracking-wider font-semibold bg-amber-50 text-amber-800 border border-amber-200/80">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-              Only {stock} left
-            </span>
-          ))}
-      </div>
-
-      {/* Bottom Action Row: Price Pill (Left) + Cart Pill Button (Right) */}
-      <div className="flex items-center justify-between gap-2 mt-auto">
-        <div className="bg-zinc-100/90 text-zinc-900 rounded-full px-3.5 py-1.5 text-xs md:text-sm font-semibold flex items-center gap-1.5 shrink min-w-0">
-          <span className="truncate">{formatNaira(product.price)}</span>
-          {product.originalPrice && product.originalPrice > product.price && (
-            <span className="text-zinc-400 line-through text-[11px] font-normal shrink-0">
+          ) : product.originalPrice && product.originalPrice > product.price ? (
+            <span className="text-zinc-400 line-through text-xs font-semibold mt-1">
               {formatNaira(product.originalPrice)}
             </span>
-          )}
+          ) : null}
         </div>
 
         <button
@@ -122,19 +125,19 @@ export default function ProductCard({ product, isNew }: ProductCardProps) {
               ? `${product.name} is out of stock`
               : `Quick buy ${product.name}`
           }
-          className={`rounded-full px-4 py-1.5 flex items-center justify-center transition-all shrink-0 shadow-xs touch-manipulation ${
+          className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 transition-all touch-manipulation cursor-pointer ${
             isOutOfStock
-              ? "bg-zinc-100 text-zinc-400 border border-zinc-200 cursor-not-allowed"
-              : "bg-black text-white hover:bg-zinc-800 cursor-pointer active:scale-95"
+              ? "bg-zinc-200 text-zinc-400 cursor-not-allowed"
+              : "bg-[#ffce27] text-black shadow-[0_8px_20px_rgba(255,206,39,0.7)] hover:scale-105 active:scale-95"
           }`}
         >
           <svg
-            width="15"
-            height="15"
+            width="20"
+            height="20"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            strokeWidth="2"
+            strokeWidth="2.2"
             strokeLinecap="round"
             strokeLinejoin="round"
             className="pointer-events-none"
