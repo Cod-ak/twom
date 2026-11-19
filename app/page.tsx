@@ -4,6 +4,7 @@ import EditorialCampaignBanners from "../components/EditorialCampaignBanners";
 import CategoryShowcase from "../components/CategoryShowcase";
 import { supabase } from "../lib/supabase";
 import { Product } from "../lib/types";
+import { SAMPLE_TEES } from "../lib/showcase-catalog";
 
 export const instant = false;
 export default async function Home() {
@@ -21,6 +22,9 @@ export default async function Home() {
   } catch {
     // If database is not configured in preview, showcases fall back gracefully
   }
+
+  const featuredProducts =
+    products.length > 0 ? products.slice(0, 4) : (SAMPLE_TEES.slice(0, 4) as Product[]);
 
   return (
     <div className="w-full bg-twom-bg text-twom-body">
@@ -58,12 +62,12 @@ export default async function Home() {
       >
         {/* Mobile Horizontal Carousel & Desktop Grid */}
         <div className="flex items-stretch md:grid md:grid-cols-2 gap-4 md:gap-6 overflow-x-auto md:overflow-visible snap-x snap-mandatory scroll-px-4 no-scrollbar -mx-4 px-4 md:scroll-px-0 md:mx-0 md:px-0 pb-2">
-          {products?.slice(0, 4).map((product: Product, index: number) => (
+          {featuredProducts.map((product: Product) => (
             <div
               key={product.id}
               className="w-[72vw] min-w-[72vw] sm:w-[48vw] sm:min-w-[48vw] shrink-0 snap-start md:w-auto md:min-w-0 md:shrink flex flex-col h-full"
             >
-              <ProductCard product={product} isNew={index === 0} />
+              <ProductCard product={product} />
             </div>
           ))}
         </div>

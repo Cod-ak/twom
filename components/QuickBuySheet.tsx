@@ -8,13 +8,13 @@ import { useGSAP } from "@gsap/react";
 import { useUIStore } from "@/lib/ui-store";
 import { useCartStore } from "@/lib/store";
 import { formatNaira } from "@/lib/utils";
-import { Product } from "@/lib/types";
 import { useScrollLock } from "@/lib/scroll-lock";
 
 const SIZES = ["XS", "S", "M", "L", "XL", "XXL"] as const;
 
 export default function QuickBuySheet() {
-  const { quickBuyProduct, closeQuickBuy, openCart } = useUIStore();
+  const { isQuickBuyOpen, quickBuyProduct, closeQuickBuy, openCart } =
+    useUIStore();
   const addItem = useCartStore((state) => state.addItem);
 
   const [selectedSize, setSelectedSize] = useState<string>("S");
@@ -27,38 +27,25 @@ export default function QuickBuySheet() {
     () => false,
   );
 
-  const isOpen = Boolean(quickBuyProduct);
-  const [shouldRender, setShouldRender] = useState(isOpen);
-  const [activeProduct, setActiveProduct] = useState<Product | null>(quickBuyProduct);
-  const [prevProductId, setPrevProductId] = useState<string | null>(
-    quickBuyProduct?.id || null,
-  );
+  const [shouldRender, setShouldRender] = useState(isQuickBuyOpen);
 
-  // Sync state during render when a new product opens
-  if (quickBuyProduct && quickBuyProduct.id !== prevProductId) {
-    setPrevProductId(quickBuyProduct.id);
-    setActiveProduct(quickBuyProduct);
-    setSelectedSize("S");
-    if (!shouldRender) {
-      setShouldRender(true);
-    }
-  } else if (isOpen && !shouldRender) {
+  if (isQuickBuyOpen && !shouldRender) {
     setShouldRender(true);
   }
 
   // Lock background scroll when Quick Buy sheet is open
-  useScrollLock("quickbuy", isOpen);
+  useScrollLock("quickbuy", isQuickBuyOpen);
 
   // Close on Escape key press
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) {
+      if (e.key === "Escape" && isQuickBuyOpen) {
         closeQuickBuy();
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, closeQuickBuy]);
+  }, [isQuickBuyOpen, closeQuickBuy]);
 
   // GSAP animation refs
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -68,7 +55,7 @@ export default function QuickBuySheet() {
     () => {
       if (!shouldRender) return;
 
-      if (isOpen) {
+      if (isQuickBuyOpen) {
         // Animate In — enable overlay pointer-events so tap-to-close works
         gsap.set(overlayRef.current, { pointerEvents: "auto" });
         gsap.to(overlayRef.current, {
@@ -103,19 +90,19 @@ export default function QuickBuySheet() {
         });
       }
     },
-    { dependencies: [isOpen, shouldRender] },
+    { dependencies: [isQuickBuyOpen, shouldRender] },
   );
 
-  if (!mounted || !shouldRender || !activeProduct) return null;
+  if (!mounted || !shouldRender || !quickBuyProduct) return null;
 
   const isLogoPlaceholder =
-    !activeProduct.image_url ||
-    activeProduct.image_url.includes("TWOM.png") ||
-    activeProduct.image_url.includes("Twom.png");
+    !quickBuyProduct.image_url ||
+    quickBuyProduct.image_url.includes("TWOM.png") ||
+    quickBuyProduct.image_url.includes("Twom.png");
 
   const handleAddToCart = () => {
     // 1. Add product to cart with chosen size
-    addItem(activeProduct, selectedSize);
+    addItem(quickBuyProduct, selectedSize);
 
     // 2. Close quick buy sheet
     closeQuickBuy();
@@ -124,7 +111,7 @@ export default function QuickBuySheet() {
     openCart();
   };
 
-  const dynamicSku = `${activeProduct.sku || "TWOM"}-${selectedSize}`;
+  const dynamicSku = `${quickBuyProduct.sku || "TWOM"}-${selectedSize}`;
 
   return (
     <div className="fixed inset-0 z-110 flex items-end sm:items-center justify-center p-0 sm:p-4">
@@ -142,7 +129,7 @@ export default function QuickBuySheet() {
         ref={sheetRef}
         role="dialog"
         aria-modal="true"
-        aria-label={`Quick add ${activeProduct.name}`}
+        aria-label={`Quick add ${quickBuyProduct.name}`}
         className="relative z-10 w-full sm:max-w-lg bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl p-6 md:p-8 flex flex-col gap-6 max-h-[90vh] overflow-y-auto no-scrollbar"
       >
         {/* Top Product Summary Row */}
@@ -151,8 +138,8 @@ export default function QuickBuySheet() {
             {/* Square Thumbnail */}
             <div className="relative w-20 h-24 bg-zinc-100 rounded-xs overflow-hidden shrink-0">
               <Image
-                src={activeProduct.image_url || "/TWOM.png"}
-                alt={activeProduct.name}
+                src={quickBuyProduct.image_url || "/TWOM.png"}
+                alt={quickBuyProduct.name}
                 fill
                 sizes="80px"
                 className={
@@ -166,13 +153,13 @@ export default function QuickBuySheet() {
             {/* Info */}
             <div className="flex flex-col gap-1 pr-4">
               <h3 className="font-nippo italic font-black text-lg md:text-xl text-black uppercase tracking-wider leading-tight">
-                {activeProduct.name}
+                {quickBuyProduct.name}
               </h3>
               <p className="font-mono text-sm font-medium text-zinc-900">
-                {formatNaira(activeProduct.price)} NGN
+                {formatNaira(quickBuyProduct.price)} NGN
               </p>
               <Link
-                href={`/products/${activeProduct.slug || activeProduct.id}`}
+                href={`/products/${quickBuyProduct.slug || quickBuyProduct.id}`}
                 onClick={closeQuickBuy}
                 className="text-xs uppercase tracking-wider text-zinc-500 hover:text-black underline underline-offset-4 transition-colors mt-1 font-medium"
               >
@@ -251,7 +238,9 @@ export default function QuickBuySheet() {
           <div className="grid grid-cols-6 gap-2">
             {SIZES.map((size) => {
               const isSelected = selectedSize === size;
-              const isOutOfStock = size === "XS"; // e.g. XS out of stock in reference
+              const isOutOfStock =
+                typeof quickBuyProduct.stock_quantity === "number" &&
+                quickBuyProduct.stock_quantity <= 0;
 
               return (
                 <button

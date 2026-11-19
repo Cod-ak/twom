@@ -1,7 +1,8 @@
+import { connection } from "next/server";
 import { createClient } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 
-// Next.js 16 Cache Components route segment config
+// Next.js 16: Explicitly allow blocking execution for server-side auth redirect
 export const instant = false;
 
 export default async function ProtectedAdminLayout({
@@ -9,6 +10,9 @@ export default async function ProtectedAdminLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // Opt into request-time dynamic execution before reading auth tokens
+  await connection();
+
   const supabase = await createClient();
 
   const {

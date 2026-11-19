@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useSyncExternalStore } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Product } from "@/lib/types";
@@ -17,23 +17,41 @@ interface ProductCardProps {
 
 export default function ProductCard({ product, isNew }: ProductCardProps) {
   const openQuickBuy = useUIStore((state) => state.openQuickBuy);
-  const [isLiked, setIsLiked] = useState(false);
 
   const stock =
     typeof product.stock_quantity === "number" ? product.stock_quantity : 999;
   const isOutOfStock = stock <= 0;
+
+  // Automated "NEW" badge logic:
+  // 1. Explicit prop `isNew` (if passed as boolean)
+  // 2. Database boolean `product.is_new`
+  // 3. Fallback: created within the last 14 days (safe hydration / compiler-pure check)
+  const isItemNew = useSyncExternalStore(
+    () => () => {},
+    () => {
+      if (typeof isNew === "boolean") return isNew;
+      if (typeof product.is_new === "boolean") return product.is_new;
+      if (product.created_at) {
+        const createdTime = new Date(product.created_at).getTime();
+        if (!Number.isNaN(createdTime)) {
+          const FOURTEEN_DAYS_MS = 14 * 24 * 60 * 60 * 1000;
+          return Date.now() - createdTime <= FOURTEEN_DAYS_MS;
+        }
+      }
+      return false;
+    },
+    () => {
+      if (typeof isNew === "boolean") return isNew;
+      if (typeof product.is_new === "boolean") return product.is_new;
+      return false;
+    },
+  );
 
   const handleQuickBuy = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (isOutOfStock) return;
     openQuickBuy(product);
-  };
-
-  const handleToggleWishlist = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsLiked((prev) => !prev);
   };
 
   const productHref = `/products/${product.slug || product.id}`;
@@ -63,42 +81,12 @@ export default function ProductCard({ product, isNew }: ProductCardProps) {
           )}
         </Link>
 
-        {/* Wishlist Heart Button in Top-Left Position */}
-        <button
-          type="button"
-          onClick={handleToggleWishlist}
-          aria-label={isLiked ? "Remove from wishlist" : "Add to wishlist"}
-          className="absolute top-3 left-3 z-10 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black/75 backdrop-blur-md border border-white/20 text-white flex items-center justify-center transition-all hover:scale-110 active:scale-90 shadow-md cursor-pointer"
-        >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill={isLiked ? "currentColor" : "none"}
-            stroke="currentColor"
-            strokeWidth="2.2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className={isLiked ? "text-rose-500 fill-rose-500" : "text-white"}
-          >
-            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
-          </svg>
-        </button>
-
-        {/* Vertical Badge in Top-Right Position */}
-        {isOutOfStock ? (
-          <span className="pointer-events-none absolute top-3 right-3 z-10 bg-zinc-900 text-white text-[9px] font-black tracking-widest px-2 py-3.5 rounded-full [writing-mode:vertical-rl] select-none uppercase shadow-md">
-            SOLD OUT
-          </span>
-        ) : product.saveBadge ? (
-          <span className="pointer-events-none absolute top-3 right-3 z-10 bg-rose-600 text-white text-[10px] font-black tracking-widest px-2 py-3.5 rounded-full [writing-mode:vertical-rl] select-none uppercase shadow-md">
-            {product.saveBadge}
-          </span>
-        ) : isNew ? (
-          <span className="pointer-events-none absolute top-3 right-3 z-10 bg-white text-black font-black text-[10px] tracking-widest px-2 py-3.5 rounded-full [writing-mode:vertical-rl] select-none uppercase shadow-md">
+        {/* Vertical NEW Badge in Top-Right Position */}
+        {isItemNew && (
+          <span className="pointer-events-none absolute top-0 right-2 z-10 inline-flex items-center justify-center bg-[#ffce27] backdrop-blur-md border border-black/20 text-black text-xs sm:text-[13px] font-black tracking-[0.22em] px-2 sm:px-4 pt-2.5 sm:pt-3 pb-3 sm:pb-3.5 rounded-b-full rounded-t-none [writing-mode:vertical-rl] select-none uppercase shadow-sm">
             NEW
           </span>
-        ) : null}
+        )}
       </div>
 
       {/* Product Title */}
@@ -111,32 +99,21 @@ export default function ProductCard({ product, isNew }: ProductCardProps) {
         </h3>
       </Link>
 
-      {/* Inventory Stock Pill */}
-      <div className="flex items-center min-h-6 mb-3">
-        {isOutOfStock ? (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-100 text-zinc-600 text-[11px] font-black tracking-wider uppercase border border-zinc-200">
-            <span className="w-2 h-2 rounded-full bg-zinc-400" />
-            OUT OF STOCK
-          </span>
-        ) : (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#ffce27] text-black text-[11px] font-black tracking-wider uppercase shadow-xs">
-            <span className="w-2 h-2 rounded-full bg-black" />
-            {stock <= 10 ? `ONLY ${stock} LEFT` : "IN STOCK"}
-          </span>
-        )}
-      </div>
-
       {/* Bottom Action Row: Bold Price (Left) + Yellow Cart Button (Right) */}
-      <div className="flex items-center justify-between gap-3 mt-auto pt-2">
+      <div className="flex items-center justify-between gap-3 mt-auto pt-3">
         <div className="flex flex-col">
           <span className="text-xl sm:text-2xl font-black text-black tracking-tight leading-none">
             {formatNaira(product.price)}
           </span>
-          {product.originalPrice && product.originalPrice > product.price && (
+          {isOutOfStock ? (
+            <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 mt-1">
+              Sold Out
+            </span>
+          ) : product.originalPrice && product.originalPrice > product.price ? (
             <span className="text-zinc-400 line-through text-xs font-semibold mt-1">
               {formatNaira(product.originalPrice)}
             </span>
-          )}
+          ) : null}
         </div>
 
         <button

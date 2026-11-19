@@ -2,6 +2,7 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import {
   ShowcaseItem,
+  SHOWCASE_SAMPLES,
   getFallbackItemsForCategory,
 } from "@/lib/showcase-catalog";
 import ProductCard from "@/components/ProductCard";
@@ -33,10 +34,12 @@ export default async function ProductsPage({
     products = null;
   }
 
-  // Fall back to showcase previews for matching campaign categories when DB is empty
+  // Fall back to showcase previews when DB is empty (by category or entire catalog)
   const fallbackProducts =
-    !error && (!products || products.length === 0) && category
-      ? getFallbackItemsForCategory(category)
+    !error && (!products || products.length === 0)
+      ? category
+        ? getFallbackItemsForCategory(category)
+        : SHOWCASE_SAMPLES
       : [];
 
   const displayedProducts: ShowcaseItem[] =

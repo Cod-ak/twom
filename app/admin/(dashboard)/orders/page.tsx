@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import { createClient } from "@/lib/supabase-server";
 import Link from "next/link";
 import { formatNaira } from "@/lib/utils";
@@ -34,11 +35,13 @@ function formatDate(isoString: string): string {
 }
 
 export default async function AdminOrdersPage() {
+  await connection();
   const supabase = await createClient();
 
   const { data: rawOrders, error } = await supabase
     .from("orders")
-    .select(`
+    .select(
+      `
       id,
       customer_name,
       customer_email,
@@ -60,7 +63,8 @@ export default async function AdminOrdersPage() {
           image_url
         )
       )
-    `)
+    `,
+    )
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -105,7 +109,8 @@ export default async function AdminOrdersPage() {
           <div className="bg-white border border-zinc-200 p-12 text-center">
             <p className="text-twom-muted text-sm">No orders recorded yet.</p>
             <p className="text-xs text-zinc-400 mt-1">
-              When customers check out, their orders will appear here in real time.
+              When customers check out, their orders will appear here in real
+              time.
             </p>
           </div>
         ) : (
@@ -116,11 +121,11 @@ export default async function AdminOrdersPage() {
                 className="bg-white border border-zinc-200 p-6 md:p-8 flex flex-col md:flex-row gap-8 justify-between shadow-xs transition-shadow hover:shadow-sm"
               >
                 {/* Order Information & Items */}
-                <div className="flex-grow">
+                <div className="grow">
                   <div className="flex flex-wrap items-center gap-3 mb-4">
                     <span
                       className={`text-[10px] uppercase tracking-widest px-2.5 py-1 font-semibold rounded-xs border ${getStatusBadgeStyle(
-                        order.status
+                        order.status,
                       )}`}
                     >
                       {order.status}
@@ -142,7 +147,9 @@ export default async function AdminOrdersPage() {
                       {order.customer_email}
                     </p>
                     <p className="text-xs text-zinc-600 mt-2 bg-zinc-50 p-2.5 rounded-xs border border-zinc-100">
-                      <span className="font-medium text-zinc-700">Shipping Address: </span>
+                      <span className="font-medium text-zinc-700">
+                        Shipping Address:{" "}
+                      </span>
                       {order.shipping_address}
                     </p>
                     {order.payment_reference && (
@@ -185,7 +192,7 @@ export default async function AdminOrdersPage() {
                 </div>
 
                 {/* Total & Action Dropdown */}
-                <div className="flex flex-col justify-between items-start md:items-end border-t md:border-t-0 md:border-l border-zinc-200 pt-4 md:pt-0 md:pl-8 md:min-w-[220px]">
+                <div className="flex flex-col justify-between items-start md:items-end border-t md:border-t-0 md:border-l border-zinc-200 pt-4 md:pt-0 md:pl-8 md:min-w-55">
                   <div className="md:text-right">
                     <p className="text-[10px] uppercase tracking-widest text-twom-muted font-mono mb-1">
                       Total Amount
@@ -208,4 +215,3 @@ export default async function AdminOrdersPage() {
     </div>
   );
 }
-

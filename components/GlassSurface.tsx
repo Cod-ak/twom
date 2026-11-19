@@ -6,6 +6,7 @@ import {
   useState,
   useRef,
   useId,
+  useSyncExternalStore,
   type CSSProperties,
   type ReactNode,
   type RefObject,
@@ -486,6 +487,31 @@ const RIM =
 const RING =
   'linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)';
 
+const checkSVGFiltersSupport = (filterId: string): boolean => {
+  if (typeof window === 'undefined' || typeof document === 'undefined') {
+    return false;
+  }
+  const isWebkit =
+    /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
+  const isFirefox = /Firefox/.test(navigator.userAgent);
+  if (isWebkit || isFirefox) {
+    return false;
+  }
+  const div = document.createElement('div');
+  div.style.backdropFilter = `url(#${filterId})`;
+  return div.style.backdropFilter !== '';
+};
+
+const checkBlurSupport = (): boolean => {
+  if (typeof window === 'undefined' || typeof CSS === 'undefined' || !CSS.supports) {
+    return true;
+  }
+  return (
+    CSS.supports('backdrop-filter', 'blur(1px)') ||
+    CSS.supports('-webkit-backdrop-filter', 'blur(1px)')
+  );
+};
+
 const GlassSurface = ({
   children,
   width,
@@ -519,9 +545,15 @@ const GlassSurface = ({
   const blueGradId = `blue-grad-${uniqueId}`;
   const softId = `soft-${uniqueId}`;
 
-  const [svgSupported, setSvgSupported] = useState<boolean>(false);
-  const [blurSupported, setBlurSupported] = useState<boolean>(true);
-  const [checked, setChecked] = useState(false);
+  const isClient = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+
+  const checked = isClient;
+  const svgSupported = isClient ? checkSVGFiltersSupport(filterId) : false;
+  const blurSupported = isClient ? checkBlurSupport() : true;
   const [webglFailed, setWebglFailed] = useState(false);
   const [boxSize, setBoxSize] = useState<string>('');
   const [loaded, setLoaded] = useState<{
@@ -730,14 +762,7 @@ const GlassSurface = ({
     else if (shape && loaded.src === shape) setArt({ src: shape, failed: true });
   }, [shape, loaded, boxSize, borderWidth, blur, opacity, brightness]);
 
-  useEffect(() => {
-    setSvgSupported(supportsSVGFilters());
-    setBlurSupported(
-      CSS.supports('backdrop-filter', 'blur(1px)') ||
-        CSS.supports('-webkit-backdrop-filter', 'blur(1px)')
-    );
-    setChecked(true);
-  }, []);
+
 
   const webgl =
     checked &&
@@ -1023,24 +1048,7 @@ const GlassSurface = ({
     };
   }, [webgl]);
 
-  const supportsSVGFilters = () => {
-    if (typeof window === 'undefined' || typeof document === 'undefined') {
-      return false;
-    }
 
-    const isWebkit =
-      /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
-    const isFirefox = /Firefox/.test(navigator.userAgent);
-
-    if (isWebkit || isFirefox) {
-      return false;
-    }
-
-    const div = document.createElement('div');
-    div.style.backdropFilter = `url(#${filterId})`;
-
-    return div.style.backdropFilter !== '';
-  };
 
   const outline = shape && art?.src === shape && !art.failed ? art : null;
   const maskUrl = outline
@@ -1096,7 +1104,7 @@ const GlassSurface = ({
   return (
     <div
       ref={containerRef}
-      className={`relative flex items-center justify-center overflow-hidden transition-opacity duration-[260ms] ease-out focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:[outline-color:light-dark(#007aff,#0a84ff)] ${className}`}
+      className={`relative flex items-center justify-center overflow-hidden transition-opacity duration-260 ease-out focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[light-dark(#007aff,#0a84ff)] ${className}`}
       style={containerStyle}
     >
       <svg
@@ -1211,7 +1219,7 @@ const GlassSurface = ({
       {frosted && !outline && (
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 rounded-[inherit] p-[3px]"
+          className="pointer-events-none absolute inset-0 rounded-[inherit] p-0.75"
           style={{
             background: RIM,
             WebkitMask: RING,
@@ -1251,7 +1259,7 @@ const GlassSurface = ({
       <div
         className={
           contentClassName ??
-          'relative z-[1] flex h-full w-full items-center justify-center rounded-[inherit] p-2'
+          'relative z-1 flex h-full w-full items-center justify-center rounded-[inherit] p-2'
         }
       >
         {children}

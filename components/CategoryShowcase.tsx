@@ -48,7 +48,7 @@ export default function CategoryShowcase({
           greenOffset={8}
           blueOffset={16}
           className="shadow-sm"
-          contentClassName="relative z-[1] inline-flex items-center p-1.5 rounded-full gap-1 sm:gap-2"
+          contentClassName="relative z-1 inline-flex items-center p-1.5 rounded-full gap-1 sm:gap-2"
         >
           {tabs.map((tab) => {
             const isActive = activeTab === tab;

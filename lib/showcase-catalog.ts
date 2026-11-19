@@ -19,9 +19,16 @@ export const SAMPLE_TEES: ShowcaseItem[] = [
     price: 5680000, // ₦56,800
     originalPrice: 9470000, // ₦94,700
     saveBadge: "SAVE ₦37,900.00",
-    image_url: "/TWOM.png",
+    image_url:
+      "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=1000&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=1000&q=80",
+      "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=1000&q=80",
+      "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=1000&q=80",
+    ],
     stock_quantity: 15,
     is_active: true,
+    is_new: true,
     created_at: SAMPLE_CREATED_AT,
   },
   {
@@ -210,9 +217,16 @@ export const SAMPLE_ACCESSORIES: ShowcaseItem[] = [
     description: "Full-grain calfskin with debossed TWOM insignia.",
     category: "Accessories",
     price: 5200000, // ₦52,000
-    image_url: "/TWOM.png",
+    image_url:
+      "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=1000&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=1000&q=80",
+      "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=1000&q=80",
+      "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=1000&q=80",
+    ],
     stock_quantity: 15,
     is_active: true,
+    is_new: true,
     created_at: SAMPLE_CREATED_AT,
   },
 ];

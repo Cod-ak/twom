@@ -8,30 +8,42 @@ export interface CartItem extends Product {
   size?: string;
 }
 
+export interface AppliedDiscount {
+  code: string;
+  percent: number;
+}
+
 interface CartStore {
   items: CartItem[];
+  discount: AppliedDiscount | null;
   addItem: (product: Product, size?: string) => void;
   removeItem: (id: string, size?: string) => void;
   updateQuantity: (id: string, quantity: number, size?: string) => void;
+  applyDiscount: (code: string, percent: number) => void;
+  removeDiscount: () => void;
   clearCart: () => void;
 }
+
+const isSameCartItem = (item: CartItem, id: string, size?: string) =>
+  item.id === id && (item.size || undefined) === (size || undefined);
 
 export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
       items: [],
+      discount: null,
 
       addItem: (product, size) => {
         const currentItems = get().items;
-        const existingItem = currentItems.find(
-          (item) => item.id === product.id && (size ? item.size === size : true)
+        const existingItem = currentItems.find((item) =>
+          isSameCartItem(item, product.id, size)
         );
 
         if (existingItem) {
           // If matching item + size is already in the cart, increase quantity
           set({
             items: currentItems.map((item) =>
-              item.id === product.id && (size ? item.size === size : true)
+              isSameCartItem(item, product.id, size)
                 ? { ...item, quantity: item.quantity + 1 }
                 : item
             ),
@@ -50,8 +62,7 @@ export const useCartStore = create<CartStore>()(
       removeItem: (id, size) => {
         set({
           items: get().items.filter(
-            (item) =>
-              !(item.id === id && (size !== undefined ? item.size === size : true))
+            (item) => !isSameCartItem(item, id, size)
           ),
         });
       },
@@ -63,14 +74,22 @@ export const useCartStore = create<CartStore>()(
         }
         set({
           items: get().items.map((item) =>
-            item.id === id && (size !== undefined ? item.size === size : true)
+            isSameCartItem(item, id, size)
               ? { ...item, quantity }
               : item
           ),
         });
       },
 
-      clearCart: () => set({ items: [] }),
+      applyDiscount: (code, percent) => {
+        set({ discount: { code, percent } });
+      },
+
+      removeDiscount: () => {
+        set({ discount: null });
+      },
+
+      clearCart: () => set({ items: [], discount: null }),
     }),
     {
       name: 'twom-cart-storage', // This is the key it saves to in Local Storage
