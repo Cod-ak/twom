@@ -174,7 +174,7 @@ export default function CartDrawer() {
       {/* Sliding Drawer Panel */}
       <aside
         ref={panelRef}
-        className="absolute top-0 right-0 h-full w-full sm:w-[440px] md:w-[460px] bg-twom-bg shadow-2xl flex flex-col z-10 font-sans"
+        className="absolute top-0 right-0 h-full w-full sm:w-110 md:w-115 bg-twom-bg shadow-2xl flex flex-col z-10 font-sans"
         aria-label="Shopping Cart Drawer"
       >
         {/* Drawer Header */}
@@ -257,7 +257,7 @@ export default function CartDrawer() {
 
                 return (
                   <div
-                    key={`${item.id}-${item.size || "default"}`}
+                    key={`${item.id}-${item.size || "default"}-${item.color || "default"}`}
                     className="flex items-center gap-4 py-3.5 first:pt-1 last:pb-1"
                   >
                     {/* Left: Squircle Image Container with soft tinted backdrop */}
@@ -291,10 +291,11 @@ export default function CartDrawer() {
                           {item.name}
                         </Link>
 
-                        {/* Category / Brand Subtitle in soft blue/teal */}
+                        {/* Category / Brand Subtitle with size and color */}
                         <p className="text-xs font-medium text-[#4f7d82] mt-0.5">
                           {item.category || "TWOM Studio"}
                           {item.size ? ` • Size: ${item.size}` : ""}
+                          {item.color ? ` • Color: ${item.color}` : ""}
                         </p>
 
                         {/* Price */}
@@ -314,9 +315,10 @@ export default function CartDrawer() {
                                 item.id,
                                 item.quantity - 1,
                                 item.size,
+                                item.color,
                               );
                             } else {
-                              removeItem(item.id, item.size);
+                              removeItem(item.id, item.size, item.color);
                             }
                           }}
                           aria-label={`Decrease quantity of ${item.name}`}
@@ -338,6 +340,7 @@ export default function CartDrawer() {
                               item.id,
                               item.quantity + 1,
                               item.size,
+                              item.color,
                             )
                           }
                           aria-label={`Increase quantity of ${item.name}`}

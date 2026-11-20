@@ -1,14 +1,11 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { supabase } from "@/lib/supabase";
-import { formatNaira } from "@/lib/utils";
-import { Product } from "@/lib/types";
 import {
   ShowcaseItem,
   getShowcaseSampleBySlug,
   isSampleProductId,
 } from "@/lib/showcase-catalog";
-import AddToCartButton from "@/components/AddToCartButton";
+import ProductPurchaseSection from "@/components/ProductPurchaseSection";
 import ProductImageGallery from "@/components/ProductImageGallery";
 
 export const instant = false;
@@ -42,8 +39,8 @@ export default async function ProductPage({
   const isSample = isSampleProductId(product.id);
 
   return (
-    <div className="w-full min-h-screen bg-twom-bg pt-32 pb-24 px-6 md:px-12">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-12 lg:gap-24">
+    <div className="w-full min-h-screen bg-twom-bg pt-[4.25rem] md:pt-[4.75rem] pb-16 md:pb-24 px-4 md:px-6">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-4 md:gap-6 items-start">
         {/* Left Column: Swipeable Product Image Gallery */}
         <div className="w-full md:w-1/2">
           <ProductImageGallery
@@ -56,63 +53,9 @@ export default async function ProductPage({
           />
         </div>
 
-        {/* Right Column: Details */}
-        <div className="w-full md:w-1/2 flex flex-col justify-center">
-          <Link
-            href="/products"
-            className="text-xs uppercase tracking-widest text-twom-muted hover:text-twom-title mb-6 inline-block transition-colors"
-          >
-            ← Back to Collection
-          </Link>
-
-          <span className="text-xs uppercase tracking-widest text-twom-muted block mb-2">
-            {product.category}
-          </span>
-          <h1 className="font-zodiak text-3xl md:text-5xl text-twom-title leading-tight mb-4">
-            {product.name}
-          </h1>
-
-          <div className="flex items-baseline gap-3 mb-8">
-            <p className="text-xl md:text-2xl font-medium text-twom-title">
-              {formatNaira(product.price)}
-            </p>
-            {product.originalPrice && product.originalPrice > product.price && (
-              <span className="text-sm text-zinc-400 line-through">
-                {formatNaira(product.originalPrice)}
-              </span>
-            )}
-          </div>
-
-          <p className="text-sm md:text-base text-twom-body leading-relaxed mb-12">
-            {product.description || "No description available for this piece."}
-          </p>
-
-          {/* Add to Cart Button */}
-          <div className="mt-8">
-            {product.stock_quantity > 0 ? (
-              <AddToCartButton product={product as Product} />
-            ) : (
-              <button
-                disabled
-                className="w-full bg-zinc-300 text-zinc-500 py-4 text-xs uppercase tracking-[0.2em] font-nippo cursor-not-allowed"
-              >
-                Out of Stock
-              </button>
-            )}
-          </div>
-
-          {/* Stock Check */}
-          <p className="text-xs text-twom-muted mt-4 text-center">
-            {product.stock_quantity > 0
-              ? `In Stock (${product.stock_quantity} available)`
-              : "Out of Stock"}
-          </p>
-          {isSample && (
-            <p className="text-[11px] uppercase tracking-wider text-zinc-400 mt-2 text-center">
-              Catalog Preview — publish matching inventory in Admin for live
-              checkout
-            </p>
-          )}
+        {/* Right Column: Details & Purchase UI (Arranged like reference) */}
+        <div className="w-full md:w-1/2">
+          <ProductPurchaseSection product={product} isSample={isSample} />
         </div>
       </div>
     </div>
