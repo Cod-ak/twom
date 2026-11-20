@@ -24,7 +24,9 @@ export default async function Home() {
   }
 
   const featuredProducts =
-    products.length > 0 ? products.slice(0, 4) : (SAMPLE_TEES.slice(0, 4) as Product[]);
+    products.length > 0
+      ? products.slice(0, 4)
+      : (SAMPLE_TEES.slice(0, 4) as Product[]);
 
   return (
     <div className="w-full bg-twom-bg text-twom-body">
