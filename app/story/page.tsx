@@ -4,7 +4,7 @@ export const instant = false;
 
 export default function StoryPage() {
   return (
-    <div className="w-full min-h-screen bg-twom-bg pt-32 pb-24 px-6 md:px-12 text-twom-body font-sans">
+    <div className="w-full min-h-screen bg-twom-bg pt-[4.25rem] md:pt-[4.75rem] pb-16 md:pb-24 px-4 md:px-6 text-twom-body font-sans">
       <div className="max-w-4xl mx-auto">
         <span className="text-xs uppercase tracking-[0.25em] text-twom-muted font-mono block mb-3">
           The Manifesto

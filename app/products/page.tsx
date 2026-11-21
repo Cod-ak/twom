@@ -1,11 +1,9 @@
-import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import {
   ShowcaseItem,
   SHOWCASE_SAMPLES,
-  getFallbackItemsForCategory,
 } from "@/lib/showcase-catalog";
-import ProductCard from "@/components/ProductCard";
+import ProductCatalogView from "@/components/ProductCatalogView";
 
 export const instant = false;
 
@@ -17,92 +15,30 @@ export default async function ProductsPage({
   const { category } = await searchParams;
 
   let products: ShowcaseItem[] | null = null;
-  let error: unknown = null;
 
   try {
-    let query = supabase.from("products").select("*").eq("is_active", true);
+    const res = await supabase
+      .from("products")
+      .select("*")
+      .eq("is_active", true)
+      .order("created_at", { ascending: false });
 
-    if (category) {
-      query = query.ilike("category", category);
-    }
-
-    const res = await query.order("created_at", { ascending: false });
     products = (res.data as ShowcaseItem[] | null) || null;
-    error = res.error;
-  } catch (err) {
-    error = err;
+  } catch {
     products = null;
   }
 
-  // Fall back to showcase previews when DB is empty (by category or entire catalog)
-  const fallbackProducts =
-    !error && (!products || products.length === 0)
-      ? category
-        ? getFallbackItemsForCategory(category)
-        : SHOWCASE_SAMPLES
-      : [];
-
-  const displayedProducts: ShowcaseItem[] =
-    products && products.length > 0
-      ? (products as ShowcaseItem[])
-      : fallbackProducts;
-
-  // Handle empty state or errors gracefully
-  if (error || displayedProducts.length === 0) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-twom-bg text-twom-title gap-4 px-6">
-        <p className="text-twom-muted">
-          {category
-            ? `No pieces found under "${category}".`
-            : "No products available at the moment."}
-        </p>
-        {category && (
-          <Link
-            href="/products"
-            className="text-xs uppercase tracking-widest text-twom-title underline underline-offset-4 hover:opacity-70 transition-opacity"
-          >
-            ← View All Pieces
-          </Link>
-        )}
-      </div>
-    );
-  }
+  // Fall back to showcase previews when DB has no live active items
+  const allProducts: ShowcaseItem[] =
+    products && products.length > 0 ? products : SHOWCASE_SAMPLES;
 
   return (
-    <div className="w-full min-h-screen bg-twom-bg pt-32 pb-24 px-4 md:px-6">
+    <div className="w-full min-h-screen bg-twom-bg pt-[4.25rem] md:pt-[4.75rem] pb-16 md:pb-24 px-4 md:px-6">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-4">
-          <div>
-            <span className="text-xs uppercase tracking-[0.2em] text-twom-muted">
-              The Collection
-            </span>
-            <h1 className="font-zodiak text-4xl md:text-6xl text-twom-title mt-2 capitalize">
-              {category ? category : "Shop All"}
-            </h1>
-          </div>
-          <div className="flex items-center gap-4">
-            {category && (
-              <Link
-                href="/products"
-                className="text-xs uppercase tracking-widest text-twom-muted hover:text-twom-title underline underline-offset-4 transition-colors"
-              >
-                Clear Filter ✕
-              </Link>
-            )}
-            <span className="text-xs uppercase tracking-widest text-twom-muted">
-              Showing {displayedProducts.length}{" "}
-              {displayedProducts.length === 1 ? "Piece" : "Pieces"}
-            </span>
-          </div>
-        </div>
-
-        {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 items-stretch">
-          {displayedProducts.map((product: ShowcaseItem) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        <ProductCatalogView
+          initialProducts={allProducts}
+          initialCategory={category}
+        />
       </div>
     </div>
   );
