@@ -8,8 +8,6 @@ import { useCartStore } from "@/lib/store";
 import { useUIStore } from "@/lib/ui-store";
 import { formatNaira } from "@/lib/utils";
 
-export const instant = false;
-
 const emptySubscribe = () => () => {};
 
 export default function CheckoutPage() {
