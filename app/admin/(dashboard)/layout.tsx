@@ -1,6 +1,7 @@
 import { connection } from "next/server";
 import { createClient } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
+import AdminInactivityGuard from "@/components/AdminInactivityGuard";
 
 // Next.js 16: Explicitly allow blocking execution for server-side auth redirect
 export const instant = false;
@@ -34,5 +35,10 @@ export default async function ProtectedAdminLayout({
     redirect("/");
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      <AdminInactivityGuard />
+      {children}
+    </>
+  );
 }

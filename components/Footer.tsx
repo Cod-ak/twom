@@ -147,6 +147,12 @@ export default function Footer() {
             >
               Terms of Service
             </Link>
+            <Link
+              href="/admin"
+              className="hover:text-twom-title transition-colors"
+            >
+              Staff Portal
+            </Link>
           </div>
         </div>
       </div>

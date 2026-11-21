@@ -1,16 +1,34 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, Suspense } from "react";
 import { createClient } from "@/lib/supabase-client";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
-export default function AdminLogin() {
+function AdminLoginForm() {
   const supabase = useMemo(() => createClient(), []);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
+
+  const nextParam = searchParams.get("next");
+  const reasonParam = searchParams.get("reason");
+
+  // Validate target redirect URL to ensure it starts with /admin and prevents open redirects
+  const safeNextUrl = useMemo(() => {
+    if (
+      nextParam &&
+      nextParam.startsWith("/admin") &&
+      !nextParam.startsWith("//") &&
+      nextParam !== "/admin/login"
+    ) {
+      return nextParam;
+    }
+    return "/admin";
+  }, [nextParam]);
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -31,7 +49,7 @@ export default function AdminLogin() {
       }
 
       router.refresh();
-      router.push("/admin");
+      router.push(safeNextUrl);
     } catch {
       setError("An unexpected network error occurred. Please try again.");
       setLoading(false);
@@ -52,6 +70,17 @@ export default function AdminLogin() {
           Restricted administrative access.
         </p>
 
+        {/* Inactivity Notification */}
+        {reasonParam === "inactivity" && !error && (
+          <div
+            role="status"
+            className="p-3.5 mb-4 text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded"
+          >
+            Your session expired after 60 minutes of inactivity. Please sign in again.
+          </div>
+        )}
+
+        {/* Error Alert */}
         {error && (
           <div
             role="alert"
@@ -118,5 +147,21 @@ export default function AdminLogin() {
         </button>
       </form>
     </div>
+  );
+}
+
+export default function AdminLogin() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-twom-bg px-6">
+          <div className="w-full max-w-md bg-white p-8 border border-zinc-200 text-center text-sm text-zinc-500">
+            Loading authentication...
+          </div>
+        </div>
+      }
+    >
+      <AdminLoginForm />
+    </Suspense>
   );
 }
