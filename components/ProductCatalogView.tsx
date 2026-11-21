@@ -90,17 +90,17 @@ export default function ProductCatalogView({
   return (
     <div className="w-full">
       {/* 1. Header Section */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-3">
+      <div className="flex flex-row justify-between items-end mb-4 gap-2">
         <div>
-          <span className="text-xs uppercase tracking-[0.25em] text-twom-muted font-mono block">
+          <span className="text-[10px] sm:text-xs uppercase tracking-[0.25em] text-twom-muted font-mono block">
             The Collection
           </span>
-          <h1 className="font-zodiak text-3xl sm:text-4xl md:text-5xl text-twom-title font-bold mt-1 capitalize tracking-tight">
+          <h1 className="font-zodiak text-2xl sm:text-4xl md:text-5xl text-twom-title font-bold mt-0.5 capitalize tracking-tight leading-none">
             {selectedCategory === "all" ? "Shop All" : selectedCategory}
           </h1>
         </div>
 
-        <div className="flex items-center gap-3 self-end md:self-auto text-xs uppercase tracking-wider text-twom-muted">
+        <div className="flex items-center gap-2.5 text-[11px] sm:text-xs uppercase tracking-wider text-twom-muted shrink-0 pb-0.5">
           <span>
             {filteredProducts.length}{" "}
             {filteredProducts.length === 1 ? "Piece" : "Pieces"}
@@ -109,7 +109,7 @@ export default function ProductCatalogView({
             <button
               type="button"
               onClick={() => handleSelectCategory("all")}
-              className="text-xs uppercase tracking-wider text-black font-bold underline underline-offset-4 hover:opacity-70 transition-opacity cursor-pointer"
+              className="text-[11px] sm:text-xs uppercase tracking-wider text-black font-bold underline underline-offset-4 hover:opacity-70 transition-opacity cursor-pointer"
             >
               Reset ✕
             </button>
