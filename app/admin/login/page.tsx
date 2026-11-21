@@ -76,7 +76,8 @@ function AdminLoginForm() {
             role="status"
             className="p-3.5 mb-4 text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded"
           >
-            Your session expired after 60 minutes of inactivity. Please sign in again.
+            Your session expired after 60 minutes of inactivity. Please sign in
+            again.
           </div>
         )}
 
