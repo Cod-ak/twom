@@ -151,3 +151,140 @@ export async function updateOrderStatus(orderId: string, newStatus: string) {
   revalidatePath("/admin/orders");
   return { success: true };
 }
+
+export async function toggleProductActive(productId: string, currentStatus: boolean) {
+  const supabase = await createClient();
+
+  // 1. Verify Admin (Zero-Trust)
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Unauthorized" };
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (profile?.role !== "admin") return { error: "Forbidden: Admin access required." };
+
+  const { error } = await supabase
+    .from("products")
+    .update({ is_active: !currentStatus })
+    .eq("id", productId);
+
+  if (error) return { error: error.message };
+
+  revalidatePath("/");
+  revalidatePath("/products");
+  revalidatePath("/admin/products");
+  return { success: true };
+}
+
+export async function updateProduct(productId: string, formData: FormData) {
+  const supabase = await createClient();
+
+  // 1. Verify Admin (Zero-Trust)
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Unauthorized" };
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (profile?.role !== "admin") return { error: "Forbidden: Admin access required." };
+
+  // 2. Extract fields
+  const name = formData.get("name") as string;
+  const category = formData.get("category") as string;
+  const description = formData.get("description") as string;
+  const priceString = formData.get("price") as string;
+  const stockString = formData.get("stock") as string;
+  const isActiveString = formData.get("is_active") as string;
+  const is_active = isActiveString === "true" || isActiveString === "on";
+
+  if (!name || !category || !priceString) {
+    return { error: "Missing required fields (name, category, price)." };
+  }
+
+  if (!PRODUCT_CATEGORIES.includes(category as ProductCategory)) {
+    return { error: `Invalid category selected: ${category}` };
+  }
+
+  const priceInKobo = Math.round(parseFloat(priceString) * 100);
+  const stock = parseInt(stockString) || 0;
+
+  // 3. Handle optional image uploads
+  const rawFiles = formData.getAll("images") as File[];
+  const imageFiles = rawFiles.filter((f) => f && f.size > 0);
+
+  const updatePayload: Record<string, unknown> = {
+    name,
+    category,
+    description,
+    price: priceInKobo,
+    stock_quantity: stock,
+    is_active,
+  };
+
+  if (imageFiles.length > 0) {
+    const publicUrls: string[] = [];
+    const baseSlug = name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)+/g, "");
+
+    for (let i = 0; i < imageFiles.length; i++) {
+      const file = imageFiles[i];
+      const fileExt = (file.name.split(".").pop() || "jpg")
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "");
+      const fileName = `${Date.now()}-${i}-${baseSlug || "piece"}.${fileExt || "jpg"}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("product-images")
+        .upload(fileName, file, {
+          contentType: file.type || "image/jpeg",
+          upsert: true,
+        });
+
+      if (uploadError) {
+        return { error: `Failed to upload image ${i + 1}: ${uploadError.message}` };
+      }
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("product-images").getPublicUrl(fileName);
+
+      publicUrls.push(publicUrl);
+    }
+
+    updatePayload.image_url = publicUrls[0];
+    updatePayload.images = publicUrls;
+  }
+
+  let { error: dbError } = await supabase
+    .from("products")
+    .update(updatePayload)
+    .eq("id", productId);
+
+  if (dbError && dbError.message.includes("images")) {
+    delete updatePayload.images;
+    const retry = await supabase.from("products").update(updatePayload).eq("id", productId);
+    dbError = retry.error;
+  }
+
+  if (dbError) return { error: "Database error: " + dbError.message };
+
+  revalidatePath("/");
+  revalidatePath("/products");
+  revalidatePath("/admin/products");
+  revalidatePath(`/admin/products/${productId}`);
+
+  return { success: true };
+}

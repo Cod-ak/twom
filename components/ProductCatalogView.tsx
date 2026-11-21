@@ -95,26 +95,26 @@ export default function ProductCatalogView({
           <span className="text-[10px] sm:text-xs uppercase tracking-[0.25em] text-twom-muted font-mono block">
             The Collection
           </span>
-          <h1 className="font-zodiak text-2xl sm:text-4xl md:text-5xl text-twom-title font-bold mt-0.5 capitalize tracking-tight leading-none">
-            {selectedCategory === "all" ? "Shop All" : selectedCategory}
-          </h1>
+          <div className="flex items-baseline gap-2.5 sm:gap-3 mt-0.5">
+            <h1 className="font-zodiak text-2xl sm:text-4xl md:text-5xl text-twom-title font-bold capitalize tracking-tight leading-none">
+              {selectedCategory === "all" ? "Shop All" : selectedCategory}
+            </h1>
+            <span className="text-[11px] sm:text-xs uppercase tracking-wider text-twom-muted font-mono">
+              ({filteredProducts.length}{" "}
+              {filteredProducts.length === 1 ? "Piece" : "Pieces"})
+            </span>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2.5 text-[11px] sm:text-xs uppercase tracking-wider text-twom-muted shrink-0 pb-0.5">
-          <span>
-            {filteredProducts.length}{" "}
-            {filteredProducts.length === 1 ? "Piece" : "Pieces"}
-          </span>
-          {selectedCategory !== "all" && (
-            <button
-              type="button"
-              onClick={() => handleSelectCategory("all")}
-              className="text-[11px] sm:text-xs uppercase tracking-wider text-black font-bold underline underline-offset-4 hover:opacity-70 transition-opacity cursor-pointer"
-            >
-              Reset ✕
-            </button>
-          )}
-        </div>
+        {selectedCategory !== "all" && (
+          <button
+            type="button"
+            onClick={() => handleSelectCategory("all")}
+            className="text-[11px] sm:text-xs uppercase tracking-wider text-black font-bold underline underline-offset-4 hover:opacity-70 transition-opacity cursor-pointer shrink-0 pb-0.5"
+          >
+            Reset ✕
+          </button>
+        )}
       </div>
 
       {/* 2. Top Filter & Sort Bar (Matching Screenshot 1) */}

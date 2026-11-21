@@ -1,6 +1,6 @@
 import { connection } from "next/server";
 import { createClient } from "@/lib/supabase-server";
-import Link from "next/link";
+import AdminHeaderNav from "@/components/AdminHeaderNav";
 import { formatNaira } from "@/lib/utils";
 import UpdateStatusButton from "@/components/UpdateStatusButton";
 import type { AdminOrder, OrderStatus } from "@/lib/types";
@@ -83,25 +83,16 @@ export default async function AdminOrdersPage() {
   return (
     <div className="min-h-screen bg-twom-bg pt-28 pb-24 px-6 md:px-12">
       <div className="max-w-5xl mx-auto">
-        {/* Navigation / Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-zinc-200">
-          <div>
-            <h1 className="font-zodiak text-4xl text-twom-title mb-1">
-              Customer Orders
-            </h1>
-            <p className="text-twom-muted text-sm">
-              Review transactions, fulfillment details, and order statuses.
-            </p>
-          </div>
+        <AdminHeaderNav currentTab="orders" userEmail={user?.email} />
 
-          <div className="flex items-center gap-3">
-            <Link
-              href="/admin"
-              className="text-xs uppercase tracking-wider text-zinc-600 border border-zinc-300 px-4 py-2 hover:text-black hover:border-black transition-colors"
-            >
-              ← Back to Products
-            </Link>
-          </div>
+        {/* Section Header */}
+        <div className="mb-6">
+          <h2 className="font-zodiak text-2xl text-twom-title">
+            Customer Orders
+          </h2>
+          <p className="text-xs text-twom-muted mt-0.5">
+            Review transactions, fulfillment details, and order statuses.
+          </p>
         </div>
 
         {/* Orders List */}
