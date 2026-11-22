@@ -1,8 +1,8 @@
 import { connection } from "next/server";
 import { createClient } from "@/lib/supabase-server";
 import AdminHeaderNav from "@/components/AdminHeaderNav";
+import OrderActionPanel from "@/components/OrderActionPanel";
 import { formatNaira } from "@/lib/utils";
-import UpdateStatusButton from "@/components/UpdateStatusButton";
 import type { AdminOrder, OrderStatus } from "@/lib/types";
 
 export const instant = false;
@@ -11,13 +11,19 @@ function getStatusBadgeStyle(status: OrderStatus): string {
   switch (status) {
     case "paid":
       return "bg-emerald-50 text-emerald-800 border-emerald-200";
+    case "processing":
+      return "bg-violet-50 text-violet-800 border-violet-200";
     case "shipped":
       return "bg-blue-50 text-blue-800 border-blue-200";
+    case "delivered":
+      return "bg-teal-50 text-teal-800 border-teal-200";
     case "pending":
       return "bg-amber-50 text-amber-800 border-amber-200";
     case "cancelled":
-    case "failed":
+    case "refunded":
       return "bg-rose-50 text-rose-800 border-rose-200";
+    case "failed":
+      return "bg-red-50 text-red-800 border-red-200";
     default:
       return "bg-zinc-100 text-zinc-700 border-zinc-200";
   }
@@ -56,6 +62,12 @@ export default async function AdminOrdersPage() {
       payment_channel,
       paid_at,
       created_at,
+      courier_name,
+      tracking_number,
+      tracking_url,
+      processing_at,
+      shipped_at,
+      delivered_at,
       order_items (
         id,
         order_id,
@@ -152,6 +164,11 @@ export default async function AdminOrdersPage() {
                         Paystack Ref: {order.payment_reference}
                       </p>
                     )}
+                    {order.shipped_at && order.courier_name && (
+                      <p className="text-[11px] font-mono text-blue-500 mt-1">
+                        Dispatched via {order.courier_name} on {formatDate(order.shipped_at)}
+                      </p>
+                    )}
                   </div>
 
                   {/* Purchased Items List */}
@@ -186,7 +203,7 @@ export default async function AdminOrdersPage() {
                   </div>
                 </div>
 
-                {/* Total & Action Dropdown */}
+                {/* Total & Smart Action Panel */}
                 <div className="flex flex-col justify-between items-start md:items-end border-t md:border-t-0 md:border-l border-zinc-200 pt-4 md:pt-0 md:pl-8 md:min-w-55">
                   <div className="md:text-right">
                     <p className="text-[10px] uppercase tracking-widest text-twom-muted font-mono mb-1">
@@ -197,9 +214,12 @@ export default async function AdminOrdersPage() {
                     </p>
                   </div>
 
-                  <UpdateStatusButton
+                  <OrderActionPanel
                     orderId={order.id}
                     currentStatus={order.status}
+                    courierName={order.courier_name}
+                    trackingNumber={order.tracking_number}
+                    trackingUrl={order.tracking_url ?? null}
                   />
                 </div>
               </div>

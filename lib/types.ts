@@ -29,7 +29,7 @@ export interface Product {
   is_new?: boolean;
 }
 
-export type OrderStatus = "pending" | "paid" | "shipped" | "cancelled" | "failed";
+export type OrderStatus = "pending" | "paid" | "processing" | "shipped" | "delivered" | "cancelled" | "refunded" | "failed";
 
 export interface OrderItemWithProduct {
   id: string;
@@ -54,5 +54,11 @@ export interface AdminOrder {
   payment_channel: string | null;
   paid_at: string | null;
   created_at: string;
+  courier_name: string | null;
+  tracking_number: string | null;
+  tracking_url: string | null;
+  shipped_at: string | null;
+  delivered_at: string | null;
+  refunded_at: string | null;
   order_items: OrderItemWithProduct[];
 }
