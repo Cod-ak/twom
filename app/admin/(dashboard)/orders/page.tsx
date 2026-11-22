@@ -38,6 +38,10 @@ export default async function AdminOrdersPage() {
   await connection();
   const supabase = await createClient();
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   const { data: rawOrders, error } = await supabase
     .from("orders")
     .select(
