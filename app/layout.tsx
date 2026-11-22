@@ -5,6 +5,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import CartDrawer from "../components/CartDrawer";
 import QuickBuySheet from "../components/QuickBuySheet";
+import AnalyticsScripts from "../components/AnalyticsScripts";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
 
@@ -92,6 +93,7 @@ export default function RootLayout({
       className={cn("h-full", "antialiased", zodiak.variable, nippo.variable, "font-sans", geist.variable)}
     >
       <body className="min-h-full flex flex-col font-sans bg-twom-bg text-twom-body">
+        <AnalyticsScripts />
         <Navbar />
         <CartDrawer />
         <QuickBuySheet />

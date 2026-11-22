@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Product } from './types';
+import { trackAddToCart } from './analytics';
 
 // This is what an item in the cart looks like
 export interface CartItem extends Product {
@@ -55,6 +56,15 @@ export const useCartStore = create<CartStore>()(
       discount: null,
 
       addItem: (product, size, color) => {
+        trackAddToCart({
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          category: String(product.category),
+          size,
+          quantity: 1,
+        });
+
         const currentItems = get().items;
         const existingItem = currentItems.find((item) =>
           isSameCartItem(item, product.id, size, color)

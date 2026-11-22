@@ -76,7 +76,7 @@ export default async function CheckoutSuccessPage({
 
   return (
     <div className="min-h-screen bg-twom-bg pt-[4.25rem] md:pt-[4.75rem] pb-16 md:pb-24 px-4 md:px-6 flex flex-col items-center">
-      <ClearCartOnMount />
+      <ClearCartOnMount order={order} />
 
       <div className="max-w-2xl w-full bg-white border border-zinc-200 p-8 md:p-12 shadow-xs">
         {/* Header */}

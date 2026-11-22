@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useState, useEffect, useSyncExternalStore } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/lib/store";
 import { useUIStore } from "@/lib/ui-store";
 import { formatNaira } from "@/lib/utils";
+import { trackBeginCheckout } from "@/lib/analytics";
 
 const emptySubscribe = () => () => {};
 
@@ -46,6 +47,12 @@ export default function CheckoutPage() {
       : Math.round(subtotal * (discount.percent / 100))
     : 0;
   const finalTotal = Math.max(0, subtotal - discountAmount);
+
+  useEffect(() => {
+    if (mounted && items.length > 0) {
+      trackBeginCheckout(items, finalTotal);
+    }
+  }, [mounted]);
 
   const handleApplyCheckoutPromo = async (e: React.FormEvent) => {
     e.preventDefault();

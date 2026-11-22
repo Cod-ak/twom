@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { formatNaira } from "@/lib/utils";
 import { useCartStore } from "@/lib/store";
 import { useUIStore } from "@/lib/ui-store";
 import { ShowcaseItem } from "@/lib/showcase-catalog";
+import { trackViewItem } from "@/lib/analytics";
 
 const SIZES = ["XS", "S", "M", "L", "XL", "XXL"] as const;
 
@@ -77,6 +78,10 @@ export default function ProductPurchaseSection({
   const isOutOfStock = product.stock_quantity <= 0;
   const sku = product.sku || `TWOM-${product.category.toUpperCase().slice(0, 3)}-01`;
   const reviewCount = getDeterministicReviewCount(product.id || product.name);
+
+  useEffect(() => {
+    trackViewItem(product);
+  }, [product]);
 
   const handleAddToCart = () => {
     if (isOutOfStock) return;
