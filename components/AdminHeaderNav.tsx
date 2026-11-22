@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 
 interface AdminHeaderNavProps {
-  currentTab?: "overview" | "products" | "orders" | "hero";
+  currentTab?: "overview" | "products" | "orders" | "hero" | "customers";
   userEmail?: string;
 }
 
@@ -100,6 +100,17 @@ export default async function AdminHeaderNav({
           }`}
         >
           Hero CMS
+        </Link>
+
+        <Link
+          href="/admin/customers"
+          className={`px-4 py-2 rounded-full text-xs uppercase tracking-wider font-medium transition-all ${
+            currentTab === "customers"
+              ? "bg-black text-white font-bold shadow-xs"
+              : "bg-white/80 hover:bg-white text-zinc-700 hover:text-black border border-zinc-200/80"
+          }`}
+        >
+          Customers
         </Link>
       </nav>
     </header>

@@ -75,3 +75,25 @@ export interface HeroSection {
   created_at?: string;
   updated_at?: string;
 }
+
+export interface CustomerOrderSummary {
+  id: string;
+  total_amount: number;
+  status: OrderStatus;
+  created_at: string;
+  items_count: number;
+}
+
+export interface CustomerSummary {
+  id: string;
+  email: string;
+  name: string;
+  is_registered: boolean;
+  role?: string;
+  orders_count: number;
+  lifetime_spend: number; // in Kobo
+  first_seen: string;
+  last_order_date: string | null;
+  latest_shipping_address: string | null;
+  orders: CustomerOrderSummary[];
+}
