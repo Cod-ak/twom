@@ -62,3 +62,16 @@ export interface AdminOrder {
   refunded_at: string | null;
   order_items: OrderItemWithProduct[];
 }
+
+export interface HeroSection {
+  id?: string;
+  headline: string;
+  subheadline?: string | null;
+  button_text: string;
+  button_link: string;
+  video_url: string;
+  poster_url: string;
+  is_active?: boolean;
+  created_at?: string;
+  updated_at?: string;
+}

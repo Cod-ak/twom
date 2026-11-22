@@ -52,6 +52,12 @@ export default async function Hero() {
           {hero.headline}
         </h1>
 
+        {hero.subheadline && (
+          <p className="text-sm md:text-base text-zinc-200 max-w-lg leading-relaxed">
+            {hero.subheadline}
+          </p>
+        )}
+
         <Link
           href={hero.button_link}
           className="border border-white text-white px-8 py-4 text-xs uppercase tracking-[0.2em] font-nippo hover:bg-white hover:text-black transition-all duration-300"

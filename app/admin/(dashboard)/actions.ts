@@ -465,3 +465,137 @@ export async function updateProduct(productId: string, formData: FormData) {
 
   return { success: true };
 }
+
+// ── 5. Hero Section CMS Manager ──────────────────────────────────────────
+export async function updateHeroSection(formData: FormData) {
+  const { supabase, error } = await verifyAdmin();
+  if (error) return { error };
+
+  const headline = (formData.get("headline") as string)?.trim();
+  const subheadline = (formData.get("subheadline") as string)?.trim() || null;
+  const button_text = (formData.get("button_text") as string)?.trim() || "Explore styles";
+  const button_link = (formData.get("button_link") as string)?.trim() || "/products";
+  let video_url = (formData.get("video_url") as string)?.trim() || "";
+  let poster_url = (formData.get("poster_url") as string)?.trim() || "";
+
+  if (!headline) {
+    return { error: "Hero headline is required." };
+  }
+
+  // Handle optional video upload
+  const videoFile = formData.get("video_file") as File | null;
+  if (videoFile && videoFile.size > 0) {
+    const fileExt = (videoFile.name.split(".").pop() || "mp4").toLowerCase();
+    const fileName = `hero-video-${Date.now()}.${fileExt}`;
+    
+    // Try hero-videos bucket, fallback to product-images
+    let uploadBucket = "hero-videos";
+    let { error: uploadError } = await supabase.storage
+      .from(uploadBucket)
+      .upload(fileName, videoFile, {
+        contentType: videoFile.type || "video/mp4",
+        upsert: true,
+      });
+
+    if (uploadError) {
+      uploadBucket = "product-images";
+      const retry = await supabase.storage
+        .from(uploadBucket)
+        .upload(fileName, videoFile, {
+          contentType: videoFile.type || "video/mp4",
+          upsert: true,
+        });
+      uploadError = retry.error;
+    }
+
+    if (uploadError) {
+      return { error: `Failed to upload video: ${uploadError.message}` };
+    }
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from(uploadBucket).getPublicUrl(fileName);
+    video_url = publicUrl;
+  }
+
+  // Handle optional poster image upload
+  const posterFile = formData.get("poster_file") as File | null;
+  if (posterFile && posterFile.size > 0) {
+    const fileExt = (posterFile.name.split(".").pop() || "jpg").toLowerCase();
+    const fileName = `hero-poster-${Date.now()}.${fileExt}`;
+
+    let uploadBucket = "hero-posters";
+    let { error: uploadError } = await supabase.storage
+      .from(uploadBucket)
+      .upload(fileName, posterFile, {
+        contentType: posterFile.type || "image/jpeg",
+        upsert: true,
+      });
+
+    if (uploadError) {
+      uploadBucket = "product-images";
+      const retry = await supabase.storage
+        .from(uploadBucket)
+        .upload(fileName, posterFile, {
+          contentType: posterFile.type || "image/jpeg",
+          upsert: true,
+        });
+      uploadError = retry.error;
+    }
+
+    if (uploadError) {
+      return { error: `Failed to upload poster image: ${uploadError.message}` };
+    }
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from(uploadBucket).getPublicUrl(fileName);
+    poster_url = publicUrl;
+  }
+
+  if (!video_url) {
+    return { error: "A video URL or uploaded video file is required." };
+  }
+
+  // Check if an active hero section exists
+  const { data: existingHero } = await supabase
+    .from("hero_sections")
+    .select("id")
+    .eq("is_active", true)
+    .maybeSingle();
+
+  if (existingHero) {
+    const { error: dbError } = await supabase
+      .from("hero_sections")
+      .update({
+        headline,
+        subheadline,
+        button_text,
+        button_link,
+        video_url,
+        poster_url: poster_url || video_url,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", existingHero.id);
+
+    if (dbError) return { error: dbError.message };
+  } else {
+    const { error: dbError } = await supabase
+      .from("hero_sections")
+      .insert({
+        headline,
+        subheadline,
+        button_text,
+        button_link,
+        video_url,
+        poster_url: poster_url || video_url,
+        is_active: true,
+      });
+
+    if (dbError) return { error: dbError.message };
+  }
+
+  revalidatePath("/");
+  revalidatePath("/admin/hero");
+  return { success: true };
+}
