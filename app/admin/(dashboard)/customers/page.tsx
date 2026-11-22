@@ -141,7 +141,7 @@ export default async function AdminCustomersPage() {
   );
 
   return (
-    <div className="min-h-screen bg-twom-bg pt-28 pb-24 px-6 md:px-12">
+    <div className="min-h-screen bg-twom-bg pt-[4.25rem] md:pt-[4.75rem] pb-24 px-6 md:px-12">
       <div className="max-w-6xl mx-auto">
         <AdminHeaderNav currentTab="customers" userEmail={user?.email} />
 

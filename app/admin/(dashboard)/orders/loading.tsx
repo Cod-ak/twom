@@ -1,6 +1,6 @@
 export default function AdminOrdersLoading() {
   return (
-    <div className="min-h-screen bg-twom-bg pt-28 pb-24 px-6 md:px-12 animate-pulse">
+    <div className="min-h-screen bg-twom-bg pt-[4.25rem] md:pt-[4.75rem] pb-24 px-6 md:px-12 animate-pulse">
       <div className="max-w-5xl mx-auto">
         {/* Header skeleton */}
         <div className="flex justify-between items-center mb-8 pb-6 border-b border-zinc-200">

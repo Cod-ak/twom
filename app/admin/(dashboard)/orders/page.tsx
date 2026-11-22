@@ -85,7 +85,7 @@ export default async function AdminOrdersPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-twom-bg pt-28 pb-24 px-6 md:px-12">
+      <div className="min-h-screen bg-twom-bg pt-[4.25rem] md:pt-[4.75rem] pb-24 px-6 md:px-12">
         <div className="max-w-5xl mx-auto bg-rose-50 border border-rose-200 p-6 text-rose-800">
           <p className="font-medium">Error loading orders</p>
           <p className="text-xs mt-1 text-rose-600">{error.message}</p>
@@ -97,7 +97,7 @@ export default async function AdminOrdersPage() {
   const orders = (rawOrders as unknown as AdminOrder[]) ?? [];
 
   return (
-    <div className="min-h-screen bg-twom-bg pt-28 pb-24 px-6 md:px-12">
+    <div className="min-h-screen bg-twom-bg pt-[4.25rem] md:pt-[4.75rem] pb-24 px-6 md:px-12">
       <div className="max-w-5xl mx-auto">
         <AdminHeaderNav currentTab="orders" userEmail={user?.email} />
 
