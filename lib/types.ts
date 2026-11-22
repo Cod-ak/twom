@@ -97,3 +97,22 @@ export interface CustomerSummary {
   latest_shipping_address: string | null;
   orders: CustomerOrderSummary[];
 }
+
+export type PromoDiscountType = "percentage" | "fixed";
+export type PromoScope = "all" | "category" | "product";
+
+export interface PromoCode {
+  id: string;
+  code: string;
+  discount_type: PromoDiscountType;
+  discount_value: number; // percentage (e.g. 30) or kobo (e.g. 1000000)
+  min_order_amount: number; // in kobo
+  max_uses: number | null;
+  used_count: number;
+  scope: PromoScope;
+  applicable_categories?: string[];
+  applicable_products?: string[];
+  expires_at: string | null;
+  is_active: boolean;
+  created_at: string;
+}

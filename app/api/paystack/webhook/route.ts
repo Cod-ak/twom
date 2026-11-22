@@ -98,7 +98,24 @@ export async function POST(req: Request) {
         console.error(`Failed to deduct stock for order ${orderId}:`, stockError);
       }
 
-      // 8. Dispatch customer acquisition confirmation and admin alert emails
+      // 8. Atomically increment promo code usage (only on confirmed payment)
+      const usedPromoCode = metadata?.discount_code;
+      if (usedPromoCode) {
+        const { error: promoError } = await supabaseAdmin.rpc(
+          "increment_promo_usage",
+          {
+            code_param: usedPromoCode,
+          }
+        );
+        if (promoError) {
+          console.error(
+            `Failed to increment promo usage for code ${usedPromoCode}:`,
+            promoError
+          );
+        }
+      }
+
+      // 9. Dispatch customer acquisition confirmation and admin alert emails
       await sendOrderConfirmation(orderId);
     }
 

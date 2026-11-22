@@ -12,6 +12,10 @@ export interface CartItem extends Product {
 export interface AppliedDiscount {
   code: string;
   percent: number;
+  discountType?: "percentage" | "fixed";
+  discountValue?: number;
+  minOrderAmount?: number;
+  fixedAmount?: number;
 }
 
 interface CartStore {
@@ -20,7 +24,16 @@ interface CartStore {
   addItem: (product: Product, size?: string, color?: string) => void;
   removeItem: (id: string, size?: string, color?: string) => void;
   updateQuantity: (id: string, quantity: number, size?: string, color?: string) => void;
-  applyDiscount: (code: string, percent: number) => void;
+  applyDiscount: (
+    code: string,
+    percent: number,
+    options?: {
+      discountType?: "percentage" | "fixed";
+      discountValue?: number;
+      minOrderAmount?: number;
+      fixedAmount?: number;
+    }
+  ) => void;
   removeDiscount: () => void;
   clearCart: () => void;
 }
@@ -73,10 +86,23 @@ export const useCartStore = create<CartStore>()(
       },
 
       removeItem: (id, size, color) => {
+        const remainingItems = get().items.filter(
+          (item) => !isSameCartItem(item, id, size, color)
+        );
+        const currentDiscount = get().discount;
+        let validDiscount = currentDiscount;
+        if (currentDiscount?.minOrderAmount) {
+          const newSubtotal = remainingItems.reduce(
+            (acc, item) => acc + item.price * item.quantity,
+            0
+          );
+          if (newSubtotal < currentDiscount.minOrderAmount) {
+            validDiscount = null;
+          }
+        }
         set({
-          items: get().items.filter(
-            (item) => !isSameCartItem(item, id, size, color)
-          ),
+          items: remainingItems,
+          discount: validDiscount,
         });
       },
 
@@ -85,17 +111,39 @@ export const useCartStore = create<CartStore>()(
           get().removeItem(id, size, color);
           return;
         }
+        const updatedItems = get().items.map((item) =>
+          isSameCartItem(item, id, size, color)
+            ? { ...item, quantity }
+            : item
+        );
+        const currentDiscount = get().discount;
+        let validDiscount = currentDiscount;
+        if (currentDiscount?.minOrderAmount) {
+          const newSubtotal = updatedItems.reduce(
+            (acc, item) => acc + item.price * item.quantity,
+            0
+          );
+          if (newSubtotal < currentDiscount.minOrderAmount) {
+            validDiscount = null;
+          }
+        }
         set({
-          items: get().items.map((item) =>
-            isSameCartItem(item, id, size, color)
-              ? { ...item, quantity }
-              : item
-          ),
+          items: updatedItems,
+          discount: validDiscount,
         });
       },
 
-      applyDiscount: (code, percent) => {
-        set({ discount: { code, percent } });
+      applyDiscount: (code, percent, options) => {
+        set({
+          discount: {
+            code,
+            percent,
+            discountType: options?.discountType || "percentage",
+            discountValue: options?.discountValue || percent,
+            minOrderAmount: options?.minOrderAmount,
+            fixedAmount: options?.fixedAmount,
+          },
+        });
       },
 
       removeDiscount: () => {

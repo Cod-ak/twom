@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase-server";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { type OrderStatus, PRODUCT_CATEGORIES, type ProductCategory } from "@/lib/types";
@@ -620,5 +621,94 @@ export async function updateHeroSection(formData: FormData) {
 
   revalidatePath("/");
   revalidatePath("/admin/hero");
+  return { success: true };
+}
+
+// ── Promo Code Management ─────────────────────────────────────────────────
+
+export async function createPromoCode(formData: FormData) {
+  const { error } = await verifyAdmin();
+  if (error) return { error };
+
+  const rawCode = formData.get("code") as string;
+  const code = rawCode?.trim().toUpperCase();
+  const discountType = (formData.get("discount_type") as string) || "percentage";
+  const rawValue = Number(formData.get("discount_value")) || 0;
+  const rawMinOrder = Number(formData.get("min_order_amount")) || 0;
+  const rawMaxUses = formData.get("max_uses") ? Number(formData.get("max_uses")) : null;
+  const rawExpiresAt = (formData.get("expires_at") as string) || null;
+  const scope = (formData.get("scope") as string) || "all";
+
+  if (!code || code.length < 2) {
+    return { error: "Promo code must be at least 2 characters." };
+  }
+
+  if (discountType === "percentage" && (rawValue <= 0 || rawValue > 100)) {
+    return { error: "Percentage discount must be between 1% and 100%." };
+  }
+
+  if (discountType === "fixed" && rawValue <= 0) {
+    return { error: "Fixed discount amount must be greater than ₦0." };
+  }
+
+  // If fixed, convert Naira input to Kobo (* 100); if percentage, store raw percentage
+  const discountValue = discountType === "fixed" ? Math.round(rawValue * 100) : rawValue;
+  // Convert minimum order amount in Naira to Kobo (* 100)
+  const minOrderAmount = Math.max(0, Math.round(rawMinOrder * 100));
+
+  const insertPayload = {
+    code,
+    discount_type: discountType,
+    discount_value: discountValue,
+    min_order_amount: minOrderAmount,
+    max_uses: rawMaxUses && rawMaxUses > 0 ? rawMaxUses : null,
+    used_count: 0,
+    scope: scope as "all" | "category" | "product",
+    expires_at: rawExpiresAt ? new Date(rawExpiresAt).toISOString() : null,
+    is_active: true,
+  };
+
+  const { error: dbError } = await supabaseAdmin
+    .from("promo_codes")
+    .insert(insertPayload);
+
+  if (dbError) {
+    if (dbError.code === "23505" || dbError.message.includes("unique")) {
+      return { error: `Promo code "${code}" already exists.` };
+    }
+    return { error: "Failed to create promo code: " + dbError.message };
+  }
+
+  revalidatePath("/admin/promos");
+  return { success: true };
+}
+
+export async function togglePromoActive(promoId: string, currentStatus: boolean) {
+  const { error } = await verifyAdmin();
+  if (error) return { error };
+
+  const { error: dbError } = await supabaseAdmin
+    .from("promo_codes")
+    .update({ is_active: !currentStatus })
+    .eq("id", promoId);
+
+  if (dbError) return { error: dbError.message };
+
+  revalidatePath("/admin/promos");
+  return { success: true };
+}
+
+export async function deletePromoCode(promoId: string) {
+  const { error } = await verifyAdmin();
+  if (error) return { error };
+
+  const { error: dbError } = await supabaseAdmin
+    .from("promo_codes")
+    .delete()
+    .eq("id", promoId);
+
+  if (dbError) return { error: dbError.message };
+
+  revalidatePath("/admin/promos");
   return { success: true };
 }

@@ -145,27 +145,34 @@ export async function POST(req: Request) {
       );
     }
 
-    // Apply verified server-side discount if provided
+    // 3b. Zero-Trust Promo Code Validation against Supabase
     const discountCode = body.discountCode?.trim().toUpperCase();
-    let discountPercent = 0;
+    let discountKobo = 0;
+    let verifiedDiscountCode: string | null = null;
+
     if (discountCode) {
-      if (discountCode === "TWOM20") {
-        discountPercent = 20;
-      } else if (
-        discountCode === "TWOM10" ||
-        discountCode === "WELCOME10" ||
-        discountCode === "VIP10"
+      const { data: promo } = await supabaseAdmin
+        .from("promo_codes")
+        .select("*")
+        .ilike("code", discountCode)
+        .maybeSingle();
+
+      if (
+        promo &&
+        promo.is_active &&
+        (!promo.expires_at || new Date(promo.expires_at).getTime() >= Date.now()) &&
+        (typeof promo.max_uses !== "number" || promo.used_count < promo.max_uses) &&
+        (!promo.min_order_amount || totalAmountInKobo >= promo.min_order_amount)
       ) {
-        discountPercent = 10;
-      } else {
-        discountPercent = 10; // Recognized active campaign code
+        verifiedDiscountCode = promo.code;
+        if (promo.discount_type === "percentage") {
+          discountKobo = Math.round(totalAmountInKobo * (promo.discount_value / 100));
+        } else {
+          discountKobo = Math.min(totalAmountInKobo, promo.discount_value);
+        }
       }
     }
 
-    const discountKobo =
-      discountPercent > 0
-        ? Math.round(totalAmountInKobo * (discountPercent / 100))
-        : 0;
     const finalAmountInKobo = Math.max(0, totalAmountInKobo - discountKobo);
 
     // 4. Create pending order in Supabase
@@ -176,6 +183,8 @@ export async function POST(req: Request) {
         customer_email: customer.email.trim().toLowerCase(),
         shipping_address: customer.address.trim(),
         total_amount: finalAmountInKobo,
+        discount_code: verifiedDiscountCode,
+        discount_amount: discountKobo,
         status: "pending",
       })
       .select("id")
@@ -245,7 +254,7 @@ export async function POST(req: Request) {
               order_id: order.id,
               customer_name: customer.name.trim(),
               customer_address: customer.address.trim(),
-              discount_code: discountCode || null,
+              discount_code: verifiedDiscountCode,
             },
           }),
         }
@@ -286,6 +295,12 @@ export async function POST(req: Request) {
     await supabaseAdmin.rpc("deduct_order_stock", {
       order_id_param: order.id,
     });
+
+    if (verifiedDiscountCode) {
+      await supabaseAdmin.rpc("increment_promo_usage", {
+        code_param: verifiedDiscountCode,
+      });
+    }
 
     // Send confirmation emails in local test mode
     await sendOrderConfirmation(order.id);

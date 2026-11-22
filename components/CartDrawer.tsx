@@ -25,6 +25,8 @@ export default function CartDrawer() {
   const [isDiscountExpanded, setIsDiscountExpanded] = useState(false);
   const [discountInput, setDiscountInput] = useState("");
   const [discountFeedback, setDiscountFeedback] = useState<string | null>(null);
+  const [discountError, setDiscountError] = useState<string | null>(null);
+  const [isValidatingPromo, setIsValidatingPromo] = useState(false);
 
   // 1. Hydration fix for React 19 / Next.js 16 SSR
   const mounted = useSyncExternalStore(
@@ -130,24 +132,47 @@ export default function CartDrawer() {
   );
 
   const discountAmount = appliedDiscount
-    ? Math.round(subtotal * (appliedDiscount.percent / 100))
+    ? appliedDiscount.discountType === "fixed" && appliedDiscount.discountValue
+      ? Math.min(subtotal, appliedDiscount.discountValue)
+      : Math.round(subtotal * (appliedDiscount.percent / 100))
     : 0;
   const finalTotal = Math.max(0, subtotal - discountAmount);
 
-  const handleApplyDiscount = (e: React.FormEvent) => {
+  const handleApplyDiscount = async (e: React.FormEvent) => {
     e.preventDefault();
     const code = discountInput.trim().toUpperCase();
     if (!code) return;
 
-    if (code === "TWOM10" || code === "WELCOME10" || code === "VIP10") {
-      applyDiscount(code, 10);
-      setDiscountFeedback("10% discount applied successfully!");
-    } else if (code === "TWOM20") {
-      applyDiscount(code, 20);
-      setDiscountFeedback("20% discount applied successfully!");
-    } else {
-      applyDiscount(code, 10);
-      setDiscountFeedback(`Promo code '${code}' applied! 10% off`);
+    setIsValidatingPromo(true);
+    setDiscountError(null);
+    setDiscountFeedback(null);
+
+    try {
+      const res = await fetch(
+        `/api/promos/validate?code=${encodeURIComponent(code)}&subtotal=${subtotal}`
+      );
+      const data = await res.json();
+
+      if (!res.ok || !data.valid) {
+        setDiscountError(data.error || "Invalid promo code.");
+        return;
+      }
+
+      applyDiscount(data.code, data.percent, {
+        discountType: data.discountType,
+        discountValue: data.discountValue,
+        minOrderAmount: data.minOrderAmount,
+      });
+
+      const label =
+        data.discountType === "percentage"
+          ? `${data.discountValue}% discount applied!`
+          : `${formatNaira(data.discountValue)} discount applied!`;
+      setDiscountFeedback(label);
+    } catch {
+      setDiscountError("Could not validate promo code. Please check your network.");
+    } finally {
+      setIsValidatingPromo(false);
     }
   };
 
@@ -155,6 +180,7 @@ export default function CartDrawer() {
     removeDiscount();
     setDiscountInput("");
     setDiscountFeedback(null);
+    setDiscountError(null);
   };
 
   return (
@@ -407,7 +433,7 @@ export default function CartDrawer() {
                   {appliedDiscount ? (
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-emerald-600 font-medium">
-                        ✓ {discountFeedback || "Discount active"}
+                        ✓ {discountFeedback || `Active: ${appliedDiscount.code}`}
                       </span>
                       <button
                         type="button"
@@ -418,24 +444,35 @@ export default function CartDrawer() {
                       </button>
                     </div>
                   ) : (
-                    <form
-                      onSubmit={handleApplyDiscount}
-                      className="flex items-center gap-2"
-                    >
-                      <input
-                        type="text"
-                        value={discountInput}
-                        onChange={(e) => setDiscountInput(e.target.value)}
-                        placeholder="Enter promo code (e.g. TWOM10)"
-                        className="flex-1 bg-zinc-50 border border-zinc-200 rounded-xl px-3 py-2 text-xs font-mono uppercase placeholder:normal-case placeholder:font-sans focus:outline-none focus:border-black"
-                      />
-                      <button
-                        type="submit"
-                        className="bg-black text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-zinc-800 transition cursor-pointer"
+                    <div>
+                      <form
+                        onSubmit={handleApplyDiscount}
+                        className="flex items-center gap-2"
                       >
-                        Apply
-                      </button>
-                    </form>
+                        <input
+                          type="text"
+                          value={discountInput}
+                          onChange={(e) => {
+                            setDiscountInput(e.target.value);
+                            setDiscountError(null);
+                          }}
+                          placeholder="Enter promo code (e.g. TWOM30)"
+                          className="flex-1 bg-zinc-50 border border-zinc-200 rounded-xl px-3 py-2 text-xs font-mono uppercase placeholder:normal-case placeholder:font-sans focus:outline-none focus:border-black"
+                        />
+                        <button
+                          type="submit"
+                          disabled={isValidatingPromo || !discountInput.trim()}
+                          className="bg-black text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-zinc-800 transition cursor-pointer disabled:opacity-50"
+                        >
+                          {isValidatingPromo ? "..." : "Apply"}
+                        </button>
+                      </form>
+                      {discountError && (
+                        <p className="text-[11px] text-rose-600 mt-2 font-medium">
+                          {discountError}
+                        </p>
+                      )}
+                    </div>
                   )}
                 </div>
               )}

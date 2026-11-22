@@ -18,11 +18,16 @@ export default function CheckoutPage() {
     () => false
   );
 
-  const { items, discount, removeItem, clearCart } = useCartStore();
+  const { items, discount, removeItem, clearCart, applyDiscount, removeDiscount } = useCartStore();
   const openCart = useUIStore((state) => state.openCart);
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [invalidIssues, setInvalidIssues] = useState<Record<string, string>>({});
+
+  // Promo code entry on checkout
+  const [checkoutPromoInput, setCheckoutPromoInput] = useState("");
+  const [promoError, setPromoError] = useState<string | null>(null);
+  const [isValidatingPromo, setIsValidatingPromo] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -36,9 +41,44 @@ export default function CheckoutPage() {
   );
 
   const discountAmount = discount
-    ? Math.round(subtotal * (discount.percent / 100))
+    ? discount.discountType === "fixed" && discount.discountValue
+      ? Math.min(subtotal, discount.discountValue)
+      : Math.round(subtotal * (discount.percent / 100))
     : 0;
   const finalTotal = Math.max(0, subtotal - discountAmount);
+
+  const handleApplyCheckoutPromo = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const code = checkoutPromoInput.trim().toUpperCase();
+    if (!code) return;
+
+    setIsValidatingPromo(true);
+    setPromoError(null);
+
+    try {
+      const res = await fetch(
+        `/api/promos/validate?code=${encodeURIComponent(code)}&subtotal=${subtotal}`
+      );
+      const data = await res.json();
+
+      if (!res.ok || !data.valid) {
+        setPromoError(data.error || "Invalid promo code.");
+        return;
+      }
+
+      applyDiscount(data.code, data.percent, {
+        discountType: data.discountType,
+        discountValue: data.discountValue,
+        minOrderAmount: data.minOrderAmount,
+      });
+
+      setCheckoutPromoInput("");
+    } catch {
+      setPromoError("Could not validate promo code. Please check your network.");
+    } finally {
+      setIsValidatingPromo(false);
+    }
+  };
 
   const hasInvalidItems = Object.keys(invalidIssues).length > 0;
 
@@ -373,6 +413,56 @@ export default function CheckoutPage() {
                     </div>
                   );
                 })}
+              </div>
+
+              {/* Promo Code Box */}
+              <div className="border-b border-zinc-100 pb-5 mb-5">
+                {discount ? (
+                  <div className="flex items-center justify-between p-3 bg-emerald-50/70 border border-emerald-200 rounded-lg">
+                    <div>
+                      <span className="text-[10px] uppercase font-mono tracking-widest text-emerald-800 block">
+                        Promo Applied
+                      </span>
+                      <span className="font-mono font-bold text-xs text-emerald-950">
+                        {discount.code} ({discount.percent}% off)
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeDiscount()}
+                      className="text-xs text-rose-600 hover:text-rose-800 font-mono font-bold cursor-pointer"
+                    >
+                      Remove ✕
+                    </button>
+                  </div>
+                ) : (
+                  <div>
+                    <form onSubmit={handleApplyCheckoutPromo} className="flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="Promo code (e.g. TWOM30)"
+                        value={checkoutPromoInput}
+                        onChange={(e) => {
+                          setCheckoutPromoInput(e.target.value.toUpperCase());
+                          setPromoError(null);
+                        }}
+                        className="flex-1 p-2.5 text-xs font-mono uppercase border border-zinc-300 rounded-lg focus:outline-none focus:border-black bg-white"
+                      />
+                      <button
+                        type="submit"
+                        disabled={isValidatingPromo || !checkoutPromoInput.trim()}
+                        className="bg-black text-white px-4 py-2.5 rounded-lg text-xs font-medium hover:bg-zinc-800 transition-colors disabled:opacity-50 cursor-pointer"
+                      >
+                        {isValidatingPromo ? "..." : "Apply"}
+                      </button>
+                    </form>
+                    {promoError && (
+                      <p className="text-[11px] text-rose-600 font-medium mt-1.5">
+                        {promoError}
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
 
               <div className="flex flex-col gap-2.5 text-xs">

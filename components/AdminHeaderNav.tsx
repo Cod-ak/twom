@@ -2,7 +2,7 @@ import Link from "next/link";
 import { adminSignOut } from "@/app/admin/(dashboard)/actions";
 
 interface AdminHeaderNavProps {
-  currentTab?: "overview" | "products" | "orders" | "hero" | "customers";
+  currentTab?: "overview" | "products" | "orders" | "hero" | "customers" | "promos";
   userEmail?: string;
 }
 
@@ -104,6 +104,17 @@ export default function AdminHeaderNav({
           }`}
         >
           Customers
+        </Link>
+
+        <Link
+          href="/admin/promos"
+          className={`px-4 py-2 rounded-full text-xs uppercase tracking-wider font-medium transition-all ${
+            currentTab === "promos"
+              ? "bg-black text-white font-bold shadow-xs"
+              : "bg-white/80 hover:bg-white text-zinc-700 hover:text-black border border-zinc-200/80"
+          }`}
+        >
+          Promo Codes
         </Link>
       </nav>
     </header>
