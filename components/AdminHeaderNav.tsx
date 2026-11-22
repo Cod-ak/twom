@@ -66,7 +66,7 @@ export default async function AdminHeaderNav({
               : "bg-white/80 hover:bg-white text-zinc-700 hover:text-black border border-zinc-200/80"
           }`}
         >
-          Add Product
+          Overview
         </Link>
 
         <Link
