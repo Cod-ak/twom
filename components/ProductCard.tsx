@@ -23,6 +23,9 @@ export default function ProductCard({ product, isNew }: ProductCardProps) {
   const isOutOfStock = stock <= 0;
 
   // Automated "NEW" badge logic:
+  // 1. Explicit prop `isNew` (if passed as boolean)
+  // 2. Database boolean `product.is_new`
+  // 3. Fallback: created within the last 14 days (safe hydration / compiler-pure check)
   const isItemNew = useSyncExternalStore(
     () => () => {},
     () => {
@@ -52,12 +55,11 @@ export default function ProductCard({ product, isNew }: ProductCardProps) {
   };
 
   const productHref = `/products/${product.slug || product.id}`;
-  const hasDiscount = product.originalPrice && product.originalPrice > product.price;
 
   return (
-    <div className="group relative flex flex-col justify-between w-full h-full bg-white rounded-2xl sm:rounded-[32px] border border-zinc-200/90 p-2 sm:p-3 shadow-xs hover:shadow-lg transition-all duration-300">
-      {/* Tall Editorial Image Container matching reference aspect ratio (~1:1.6) */}
-      <div className="relative aspect-[1/1.6] w-full overflow-hidden rounded-xl sm:rounded-[24px] bg-zinc-100 isolate">
+    <div className="group relative flex flex-col justify-between w-full h-full bg-white rounded-2xl sm:rounded-[36px] border-2 sm:border-[3.5px] border-black p-2.5 sm:p-4 shadow-md hover:shadow-xl transition-all duration-300">
+      {/* Tall Editorial Image Container matching reference height / aspect ratio */}
+      <div className="relative aspect-[1/1.6] w-full overflow-hidden rounded-xl sm:rounded-[26px] bg-zinc-100 isolate">
         <Link
           href={productHref}
           className="relative block w-full h-full cursor-pointer"
@@ -79,91 +81,72 @@ export default function ProductCard({ product, isNew }: ProductCardProps) {
           )}
         </Link>
 
-        {/* Top-Right Ribbon Badges */}
+        {/* Vertical Ribbon Badge in Top-Right Position: SOLD OUT overrides NEW */}
         {isOutOfStock ? (
-          <span className="pointer-events-none absolute top-0 right-0 z-10 inline-flex items-center justify-center bg-[#222222] text-white text-[9px] sm:text-[10px] font-mono font-bold tracking-wider px-1.5 sm:px-2 pt-2 pb-3 rounded-bl-xl [writing-mode:vertical-rl] select-none uppercase shadow-xs">
+          <span className="pointer-events-none absolute top-0 right-1.5 sm:right-2 z-10 inline-flex items-center justify-center bg-[#222222] backdrop-blur-md border border-white/15 text-white text-[9px] sm:text-[11px] font-black tracking-[0.2em] px-1 sm:px-3 pt-1.5 sm:pt-3 pb-2.5 sm:pb-3.5 rounded-b-full rounded-t-none [writing-mode:vertical-rl] select-none uppercase shadow-sm">
             SOLD OUT
           </span>
-        ) : hasDiscount ? (
-          <span className="pointer-events-none absolute top-0 right-0 z-10 inline-flex items-center justify-center bg-[#dc2626] text-white text-[9px] sm:text-[10px] font-mono font-bold tracking-wider px-1.5 sm:px-2 pt-2 pb-3 rounded-bl-xl [writing-mode:vertical-rl] select-none uppercase shadow-xs">
-            SAVE {formatNaira((product.originalPrice || 0) - product.price)}
-          </span>
         ) : isItemNew ? (
-          <span className="pointer-events-none absolute top-0 right-0 z-10 inline-flex items-center justify-center bg-[#ffce27] text-black text-[9px] sm:text-[10px] font-mono font-black tracking-wider px-1.5 sm:px-2 pt-2 pb-3 rounded-bl-xl [writing-mode:vertical-rl] select-none uppercase shadow-xs">
+          <span className="pointer-events-none absolute top-0 right-1.5 sm:right-2 z-10 inline-flex items-center justify-center bg-[#ffce27] backdrop-blur-md border border-black/20 text-black text-[10px] sm:text-[13px] font-black tracking-[0.2em] px-1.5 sm:px-4 pt-1.5 sm:pt-3 pb-2 sm:pb-3.5 rounded-b-full rounded-t-none [writing-mode:vertical-rl] select-none uppercase shadow-xs">
             NEW
           </span>
         ) : null}
       </div>
 
-      {/* Content Area */}
-      <div className="flex flex-col grow justify-between pt-2.5 sm:pt-3">
-        <div>
-          {/* Product Title */}
-          <Link
-            href={productHref}
-            className="hover:opacity-75 transition-opacity block mb-1"
-          >
-            <h3 className="text-xs sm:text-sm md:text-base font-bold text-twom-title leading-snug line-clamp-1 tracking-tight">
-              {product.name}
-            </h3>
-          </Link>
+      {/* Product Title */}
+      <Link
+        href={productHref}
+        className="hover:opacity-75 transition-opacity block mt-2 sm:mt-3.5 mb-1 sm:mb-2"
+      >
+        <h3 className="text-xs sm:text-lg md:text-xl font-bold text-black leading-snug line-clamp-1 tracking-tight">
+          {product.name}
+        </h3>
+      </Link>
 
-          {/* Low Stock Indicator (e.g. • ONLY 10 LEFT) */}
-          {stock > 0 && stock <= 15 ? (
-            <div className="mb-2">
-              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200/80 text-[9px] sm:text-[10px] font-mono font-bold tracking-wider text-amber-900">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                ONLY {stock} LEFT
-              </span>
-            </div>
+      {/* Bottom Action Row: Bold Price (Left) + Signature Yellow Cart Button (Right) */}
+      <div className="flex items-center justify-between gap-1.5 sm:gap-3 mt-auto pt-1.5 sm:pt-3">
+        <div className="flex flex-col min-w-0">
+          <span className="text-sm sm:text-xl md:text-2xl font-black text-black tracking-tight leading-none truncate">
+            {formatNaira(product.price)}
+          </span>
+          {product.originalPrice && product.originalPrice > product.price ? (
+            <span className="text-zinc-400 line-through text-[10px] sm:text-xs font-semibold mt-0.5 sm:mt-1 truncate">
+              {formatNaira(product.originalPrice)}
+            </span>
           ) : null}
         </div>
 
-        {/* Bottom Action Row: Price Pill (Left) + Black Circle Cart Button (Right) */}
-        <div className="flex items-center justify-between gap-2 mt-auto pt-1.5">
-          <div className="inline-flex items-center gap-1.5 sm:gap-2 bg-zinc-100/90 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full min-w-0">
-            <span className="text-xs sm:text-sm font-bold text-black tracking-tight leading-none whitespace-nowrap">
-              {formatNaira(product.price)}
-            </span>
-            {hasDiscount ? (
-              <span className="text-zinc-400 line-through text-[10px] sm:text-xs font-normal whitespace-nowrap">
-                {formatNaira(product.originalPrice!)}
-              </span>
-            ) : null}
-          </div>
-
-          <button
-            type="button"
-            disabled={isOutOfStock}
-            onClick={handleQuickBuy}
-            aria-label={
-              isOutOfStock
-                ? `${product.name} is sold out`
-                : `Quick buy ${product.name}`
-            }
-            className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center shrink-0 transition-all touch-manipulation cursor-pointer ${
-              isOutOfStock
-                ? "bg-zinc-200 text-zinc-400 cursor-not-allowed"
-                : "bg-black text-white hover:bg-zinc-800 hover:scale-105 active:scale-95 shadow-xs"
-            }`}
+        <button
+          type="button"
+          disabled={isOutOfStock}
+          onClick={handleQuickBuy}
+          aria-label={
+            isOutOfStock
+              ? `${product.name} is sold out`
+              : `Quick buy ${product.name}`
+          }
+          className={`w-8 h-8 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-full flex items-center justify-center shrink-0 transition-all touch-manipulation cursor-pointer ${
+            isOutOfStock
+              ? "bg-zinc-200 text-zinc-400 cursor-not-allowed"
+              : "bg-[#ffce27] text-black shadow-[0_4px_14px_rgba(255,206,39,0.5)] sm:shadow-[0_8px_20px_rgba(255,206,39,0.7)] hover:scale-105 active:scale-95"
+          }`}
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="sm:w-5 sm:h-5 pointer-events-none"
           >
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="pointer-events-none"
-            >
-              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
-              <line x1="3" y1="6" x2="21" y2="6" />
-              <path d="M16 10a4 4 0 0 1-8 0" />
-            </svg>
-          </button>
-        </div>
+            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <path d="M16 10a4 4 0 0 1-8 0" />
+          </svg>
+        </button>
       </div>
     </div>
   );
