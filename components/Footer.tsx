@@ -92,7 +92,7 @@ export default function Footer() {
             <span className="text-twom-muted">42 Mercer Street, New York</span>
             <span className="text-twom-muted">14 Rue Saint-Honoré, Paris</span>
             <Link
-              href="/appointments"
+              href="/concierge"
               className="hover:text-twom-title transition-colors underline underline-offset-4 pt-1"
             >
               Book an Appointment
