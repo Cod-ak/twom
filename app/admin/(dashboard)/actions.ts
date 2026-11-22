@@ -2,8 +2,15 @@
 
 import { createClient } from "@/lib/supabase-server";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { type OrderStatus, PRODUCT_CATEGORIES, type ProductCategory } from "@/lib/types";
 import { sendDispatchNotification, sendCancellationNotification } from "@/lib/email";
+
+export async function adminSignOut() {
+  const supabase = await createClient();
+  await supabase.auth.signOut();
+  redirect("/admin/login");
+}
 
 export async function addProduct(formData: FormData) {
   const supabase = await createClient();

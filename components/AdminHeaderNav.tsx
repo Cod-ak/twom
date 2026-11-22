@@ -1,22 +1,15 @@
 import Link from "next/link";
-import { createClient } from "@/lib/supabase-server";
-import { redirect } from "next/navigation";
+import { adminSignOut } from "@/app/admin/(dashboard)/actions";
 
 interface AdminHeaderNavProps {
   currentTab?: "overview" | "products" | "orders" | "hero" | "customers";
   userEmail?: string;
 }
 
-export default async function AdminHeaderNav({
+export default function AdminHeaderNav({
   currentTab = "overview",
   userEmail,
 }: AdminHeaderNavProps) {
-  const handleSignOut = async () => {
-    "use server";
-    const client = await createClient();
-    await client.auth.signOut();
-    redirect("/admin/login");
-  };
 
   return (
     <header className="mb-8 pb-6 border-b border-zinc-200">
@@ -45,7 +38,7 @@ export default async function AdminHeaderNav({
             Live Store ↗
           </Link>
 
-          <form action={handleSignOut}>
+          <form action={adminSignOut}>
             <button
               type="submit"
               className="px-3.5 py-2 text-xs uppercase tracking-wider text-zinc-600 border border-zinc-300 hover:text-black hover:border-black transition-colors cursor-pointer"
