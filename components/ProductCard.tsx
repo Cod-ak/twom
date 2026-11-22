@@ -58,8 +58,8 @@ export default function ProductCard({ product, isNew }: ProductCardProps) {
 
   return (
     <div className="group relative flex flex-col justify-between w-full h-full bg-white rounded-2xl sm:rounded-[36px] border-2 sm:border-[3.5px] border-black p-2.5 sm:p-4 shadow-md hover:shadow-xl transition-all duration-300">
-      {/* Tall Editorial Image Container matching reference height / aspect ratio */}
-      <div className="relative aspect-[1/1.6] w-full overflow-hidden rounded-xl sm:rounded-[26px] bg-zinc-100 isolate">
+      {/* Image container: reduced height by 20% from 1:1.6 -> 1:1.28 */}
+      <div className="relative aspect-[1/1.28] w-full overflow-hidden rounded-xl sm:rounded-[26px] bg-zinc-100 isolate">
         <Link
           href={productHref}
           className="relative block w-full h-full cursor-pointer"
