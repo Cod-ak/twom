@@ -329,6 +329,22 @@ export async function cancelAndRefundOrder(orderId: string) {
   return { success: true };
 }
 
+// ── 5. Status Updater (Direct State Change) ───────────────────────────────
+export async function updateOrderStatus(orderId: string, newStatus: OrderStatus) {
+  const { supabase, error } = await verifyAdmin();
+  if (error) return { error };
+
+  const { error: dbError } = await supabase
+    .from("orders")
+    .update({ status: newStatus })
+    .eq("id", orderId);
+
+  if (dbError) return { error: dbError.message };
+
+  revalidatePath("/admin/orders");
+  return { success: true };
+}
+
 export async function toggleProductActive(productId: string, currentStatus: boolean) {
   const supabase = await createClient();
 
