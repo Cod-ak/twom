@@ -31,9 +31,54 @@ const zodiak = localFont({
   display: "swap",
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://twom.vercel.app";
+
 export const metadata: Metadata = {
-  title: "TWOM | Luxury Minimalist Apparel",
-  description: "Designed for working professionals. The art of restraint.",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "TWOM | Luxury Minimalist Apparel",
+    template: "%s | TWOM Atelier",
+  },
+  description: "Designed for working professionals. The art of restraint. Modern Nigerian luxury tailoring.",
+  keywords: [
+    "TWOM",
+    "TWOM Atelier",
+    "Luxury Minimalist Apparel",
+    "Nigerian Fashion",
+    "Lagos Tailoring",
+    "Contemporary Menswear",
+    "Minimalist Fashion",
+  ],
+  authors: [{ name: "TWOM Studios" }],
+  creator: "TWOM Studios",
+  openGraph: {
+    type: "website",
+    locale: "en_NG",
+    url: siteUrl,
+    siteName: "TWOM Atelier",
+    title: "TWOM | Luxury Minimalist Apparel",
+    description: "Designed for working professionals. The art of restraint. Modern Nigerian luxury tailoring.",
+    images: [
+      {
+        url: "https://wygcegdwyaajxzjkczis.supabase.co/storage/v1/object/public/hero-posters/hero/main/poster.jpeg",
+        width: 1200,
+        height: 630,
+        alt: "TWOM Atelier Collection",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "TWOM | Luxury Minimalist Apparel",
+    description: "Designed for working professionals. The art of restraint.",
+    images: [
+      "https://wygcegdwyaajxzjkczis.supabase.co/storage/v1/object/public/hero-posters/hero/main/poster.jpeg",
+    ],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import {
@@ -7,8 +8,64 @@ import {
 } from "@/lib/showcase-catalog";
 import ProductPurchaseSection from "@/components/ProductPurchaseSection";
 import ProductImageGallery from "@/components/ProductImageGallery";
+import { formatNaira } from "@/lib/utils";
 
 export const instant = false;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+
+  const { data: dbProduct } = await supabase
+    .from("products")
+    .select("name, description, price, image_url, category")
+    .eq("slug", slug)
+    .eq("is_active", true)
+    .maybeSingle();
+
+  const sample = !dbProduct ? getShowcaseSampleBySlug(slug) : undefined;
+  const product = dbProduct || sample;
+
+  if (!product) {
+    return {
+      title: "Piece Not Found",
+      description: "The requested atelier garment is not in the archive.",
+    };
+  }
+
+  const formattedPrice = formatNaira(product.price);
+  const title = `${product.name} (${formattedPrice})`;
+  const description =
+    product.description ||
+    `Acquire ${product.name} from the TWOM Atelier. ${product.category}. Tailored luxury minimalism.`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      images: [
+        {
+          url: product.image_url,
+          width: 1200,
+          height: 1500,
+          alt: product.name,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [product.image_url],
+    },
+  };
+}
 
 // In Next.js 16, params is a Promise, so we must await it
 export default async function ProductPage({
