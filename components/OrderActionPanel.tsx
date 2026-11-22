@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { acknowledgeOrder, dispatchOrder, cancelAndRefundOrder } from "@/app/admin/(dashboard)/actions";
+import { acknowledgeOrder, dispatchOrder, cancelAndRefundOrder, markOrderDelivered } from "@/app/admin/(dashboard)/actions";
 import type { OrderStatus } from "@/lib/types";
 
 const COURIERS = [
@@ -83,6 +83,20 @@ export default function OrderActionPanel({
     });
   };
 
+  // ── Action: Mark Delivered (SHIPPED → DELIVERED) ─────────────────────────
+  const handleMarkDelivered = () => {
+    setFeedback(null, null);
+    startTransition(async () => {
+      const result = await markOrderDelivered(orderId);
+      if (result?.error) {
+        setFeedback(result.error, null);
+      } else {
+        setStatus("delivered");
+        setFeedback(null, "Order marked as delivered.");
+      }
+    });
+  };
+
   // ── Action: Cancel + Refund ───────────────────────────────────────────────
   const handleCancel = () => {
     if (cancelConfirmText.trim().toLowerCase() !== "confirm") {
@@ -151,9 +165,14 @@ export default function OrderActionPanel({
             )}
           </div>
         )}
-        <p className="text-[11px] text-zinc-400 mt-3 max-w-[200px] leading-relaxed">
-          Awaiting customer delivery confirmation.
-        </p>
+        <button
+          onClick={handleMarkDelivered}
+          disabled={isPending}
+          className="w-full flex items-center justify-center gap-2 bg-emerald-700 text-white px-4 py-2.5 text-xs uppercase tracking-wider font-medium hover:bg-emerald-800 transition-colors disabled:opacity-50 mt-3"
+        >
+          {isPending ? "Saving..." : "✓ Mark as Delivered"}
+        </button>
+        {error && <p className="text-[11px] text-rose-600 mt-2">{error}</p>}
         {success && <p className="text-[11px] text-emerald-700 mt-2">{success}</p>}
       </div>
     );

@@ -228,7 +228,36 @@ export async function dispatchOrder(orderId: string, formData: FormData) {
   return { success: true };
 }
 
-// ── 3. Cancel Order + Restock + Paystack Refund (PAID/PROCESSING → CANCELLED) ─
+// ── 3. Mark as Delivered (SHIPPED → DELIVERED) ───────────────────────────
+export async function markOrderDelivered(orderId: string) {
+  const { supabase, error } = await verifyAdmin();
+  if (error) return { error };
+
+  const { data: order } = await supabase
+    .from("orders")
+    .select("status")
+    .eq("id", orderId)
+    .single();
+
+  if (order?.status !== "shipped") {
+    return { error: "Only SHIPPED orders can be marked as delivered." };
+  }
+
+  const { error: dbError } = await supabase
+    .from("orders")
+    .update({
+      status: "delivered",
+      delivered_at: new Date().toISOString(),
+    })
+    .eq("id", orderId);
+
+  if (dbError) return { error: dbError.message };
+
+  revalidatePath("/admin/orders");
+  return { success: true };
+}
+
+// ── 4. Cancel Order + Restock + Paystack Refund (PAID/PROCESSING → CANCELLED) ─
 export async function cancelAndRefundOrder(orderId: string) {
   const { supabase, error } = await verifyAdmin();
   if (error) return { error };
