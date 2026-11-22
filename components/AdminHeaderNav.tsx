@@ -38,6 +38,16 @@ export default function AdminHeaderNav({
             Live Store ↗
           </Link>
 
+          <a
+            href="https://vercel.com/dashboard"
+            target="_blank"
+            rel="noreferrer"
+            title="Open Vercel Web Analytics"
+            className="px-3.5 py-2 text-xs uppercase tracking-wider text-twom-muted hover:text-black border border-zinc-200 hover:border-black transition-colors"
+          >
+            Analytics ↗
+          </a>
+
           <form action={adminSignOut}>
             <button
               type="submit"
