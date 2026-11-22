@@ -59,7 +59,7 @@ export default function CategoryShowcase({
                 onClick={() => setActiveTab(tab)}
                 className={`relative px-4 sm:px-6 py-2 sm:py-2.5 rounded-full font-nippo italic uppercase text-xs sm:text-sm md:text-base tracking-wider transition-all duration-300 cursor-pointer ${
                   isActive
-                    ? "liquid-glass-pill text-twom-title font-black shadow-[0_4px_12px_rgba(0,0,0,0.06)]"
+                    ? "bg-[#ffce27] text-black font-black shadow-[0_4px_14px_rgba(255,206,39,0.5)]"
                     : "text-zinc-600 hover:text-twom-title font-bold hover:bg-white/40"
                 }`}
               >
