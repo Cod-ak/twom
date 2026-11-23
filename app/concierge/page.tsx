@@ -104,7 +104,7 @@ export default function ConciergePage() {
 
           <Link
             href="/products"
-            className="bg-black text-white px-8 py-3.5 text-xs uppercase tracking-[0.2em] font-nippo hover:bg-zinc-800 transition-colors text-center"
+            className="liquid-glass-pill rounded-full text-black font-bold px-8 py-3.5 text-xs uppercase tracking-[0.2em] font-nippo hover:scale-[1.02] active:scale-[0.98] transition-all text-center"
           >
             Explore Collection →
           </Link>

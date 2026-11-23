@@ -1,6 +1,6 @@
 export default function CheckoutLoading() {
   return (
-    <div className="min-h-screen bg-twom-bg pt-32 pb-24 px-6 md:px-12 animate-pulse">
+    <div className="min-h-screen bg-twom-bg pt-[4.25rem] md:pt-[4.75rem] pb-24 px-4 sm:px-6 md:px-12 animate-pulse">
       <div className="max-w-5xl mx-auto">
         <div className="mb-10 pb-6 border-b border-zinc-200">
           <div className="h-4 w-24 bg-zinc-200 mb-3" />

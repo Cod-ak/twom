@@ -35,6 +35,23 @@
   z-index: 50;
 }
 
+.nav-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5rem;
+  pointer-events: none;
+  z-index: 100;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+  will-change: transform, opacity;
+}
+
+.nav-header-hidden {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+
 .nav-logo {
   position: absolute;
   top: 1rem;
@@ -43,6 +60,7 @@
   width: 2.25rem;
   height: 2.25rem;
   z-index: 100;
+  pointer-events: auto;
 }
 
 .nav-logo a {
@@ -60,6 +78,7 @@
   cursor: pointer;
   z-index: 100;
   padding: 0.5rem;
+  pointer-events: auto;
 }
 
 .nav-cart {
@@ -74,6 +93,7 @@
   align-items: center;
   justify-content: center;
   transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: auto;
 }
 
 .nav-cart:hover {

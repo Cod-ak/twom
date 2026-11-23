@@ -41,13 +41,19 @@ export default function CategoryShowcase({
         <GlassSurface
           borderRadius={9999}
           borderWidth={0.07}
-          distortionScale={-110}
-          displace={0.4}
-          backgroundOpacity={0.12}
+          brightness={50}
+          opacity={0.93}
+          blur={1}
+          displace={0.5}
+          backgroundOpacity={0}
+          saturation={1}
+          distortionScale={-180}
           redOffset={0}
-          greenOffset={8}
-          blueOffset={16}
-          className="shadow-sm"
+          greenOffset={10}
+          blueOffset={20}
+          refraction
+          renderer="auto"
+          className="shadow-[0_8px_30px_rgba(0,0,0,0.08)]"
           contentClassName="relative z-1 inline-flex items-center p-1.5 rounded-full gap-1 sm:gap-2"
         >
           {tabs.map((tab) => {

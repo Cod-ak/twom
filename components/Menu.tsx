@@ -50,6 +50,7 @@ const OPEN_FULL = `M${SVG_W},${SVG_H} Q${SVG_CX},${SVG_H} 0,${SVG_H} L0,0 L${SVG
 
 export default function Menu() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isNavHidden, setIsNavHidden] = useState(false);
   // Hydration safety: useSyncExternalStore returns false on server, true on client
   // without triggering a cascading setState in an effect
   const mounted = useSyncExternalStore(
@@ -305,91 +306,130 @@ export default function Menu() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, toggleMenu]);
 
+  // Hide navbar on scroll down (ease out) and show on scroll up (ease in)
+  useEffect(() => {
+    let lastScrollY = window.scrollY;
+    let ticking = false;
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentScrollY = window.scrollY;
+          const diff = currentScrollY - lastScrollY;
+
+          // Always visible near top of page
+          if (currentScrollY < 60) {
+            setIsNavHidden(false);
+          } else if (diff > 8) {
+            // Scrolling down towards bottom -> ease out / hide
+            setIsNavHidden(true);
+          } else if (diff < -8) {
+            // Scrolling up towards top -> ease in / show
+            setIsNavHidden(false);
+          }
+
+          lastScrollY = currentScrollY;
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <div className={styles.nav}>
-      {/* 1. Toggle Menu on the Left */}
-      <button
-        type="button"
-        className={styles["nav-toggle"]}
-        onClick={toggleMenu}
-        aria-label="Toggle navigation menu"
+      <header
+        className={`${styles["nav-header"]}${
+          isNavHidden && !isOpen ? ` ${styles["nav-header-hidden"]}` : ""
+        }`}
       >
-        <p ref={navToggleMenuRef} className={styles["nav-toggle-menu"]}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            width="24"
-            height="24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            style={{ pointerEvents: "none" }}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-            />
-          </svg>
-        </p>
-        <p ref={navToggleCloseRef} className={styles["nav-toggle-close"]}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            width="24"
-            height="24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            style={{ pointerEvents: "none" }}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M6 18 18 6M6 6l12 12"
-            />
-          </svg>
-        </p>
-      </button>
-
-      {/* 2. Brand Logo in the Center */}
-      <div className={styles["nav-logo"]}>
-        <Link href="/" onClick={handleLogoClick}>
-          <Image src="/TWOM.png" alt="Logo" width={64} height={64} priority />
-        </Link>
-      </div>
-
-      {/* 3. Shopping Cart on the Extreme Right */}
-      <button
-        type="button"
-        onClick={handleCartClick}
-        className={styles["nav-cart"]}
-        aria-label="Toggle Shopping Bag"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          width="24"
-          height="24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-          className="size-6"
-          style={{ pointerEvents: "none" }}
+        {/* 1. Toggle Menu on the Left */}
+        <button
+          type="button"
+          className={styles["nav-toggle"]}
+          onClick={toggleMenu}
+          aria-label="Toggle navigation menu"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
-          />
-        </svg>
+          <p ref={navToggleMenuRef} className={styles["nav-toggle-menu"]}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              width="24"
+              height="24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              style={{ pointerEvents: "none" }}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+              />
+            </svg>
+          </p>
+          <p ref={navToggleCloseRef} className={styles["nav-toggle-close"]}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              width="24"
+              height="24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              style={{ pointerEvents: "none" }}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6 18 18 6M6 6l12 12"
+              />
+            </svg>
+          </p>
+        </button>
 
-        {totalCount > 0 && (
-          <span className={styles["cart-badge"]}>
-            {totalCount}
-          </span>
-        )}
-      </button>
+        {/* 2. Brand Logo in the Center */}
+        <div className={styles["nav-logo"]}>
+          <Link href="/" onClick={handleLogoClick}>
+            <Image src="/TWOM.png" alt="Logo" width={64} height={64} priority />
+          </Link>
+        </div>
+
+        {/* 3. Shopping Cart on the Extreme Right */}
+        <button
+          type="button"
+          onClick={handleCartClick}
+          className={styles["nav-cart"]}
+          aria-label="Toggle Shopping Bag"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            width="24"
+            height="24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="size-6"
+            style={{ pointerEvents: "none" }}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
+            />
+          </svg>
+
+          {totalCount > 0 && (
+            <span className={styles["cart-badge"]}>
+              {totalCount}
+            </span>
+          )}
+        </button>
+      </header>
 
       <div
         ref={menuRef}

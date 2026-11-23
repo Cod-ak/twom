@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 
 export default function ShippingPage() {
   return (
-    <div className="w-full min-h-screen bg-twom-bg pt-[4.25rem] md:pt-[4.75rem] pb-16 md:pb-24 px-4 md:px-6 text-twom-body font-sans">
+    <div className="w-full min-h-screen bg-twom-bg pt-17 md:pt-19 pb-16 md:pb-24 px-4 md:px-6 text-twom-body font-sans">
       <div className="max-w-4xl mx-auto space-y-12">
         {/* Header */}
         <div>
@@ -39,13 +39,10 @@ export default function ShippingPage() {
             <span className="text-[10px] uppercase font-mono tracking-widest text-zinc-400 block">
               Metropolis Express
             </span>
-            <h3 className="font-zodiak text-2xl text-twom-title">
-              Lagos
-            </h3>
+            <h3 className="font-zodiak text-2xl text-twom-title">Lagos</h3>
             <p className="text-xs text-zinc-600 leading-relaxed">
-              <strong>1 – 2 Business Days.</strong> Same-day or next-day
-              private courier dispatch with direct call notification prior to
-              arrival.
+              <strong>1 – 2 Business Days.</strong> Same-day or next-day private
+              courier dispatch with direct call notification prior to arrival.
             </p>
             <span className="inline-block text-[11px] font-mono text-emerald-800 font-bold bg-emerald-50 px-2 py-0.5 rounded-sm">
               Standard: ₦3,500
@@ -56,12 +53,11 @@ export default function ShippingPage() {
             <span className="text-[10px] uppercase font-mono tracking-widest text-zinc-400 block">
               Interstate Nigeria
             </span>
-            <h3 className="font-zodiak text-2xl text-twom-title">
-              Nationwide
-            </h3>
+            <h3 className="font-zodiak text-2xl text-twom-title">Nationwide</h3>
             <p className="text-xs text-zinc-600 leading-relaxed">
-              <strong>2 – 4 Business Days.</strong> Dispatched via DHL Nigeria or
-              GIG Logistics with live door-to-door tracking sent to your email.
+              <strong>2 – 4 Business Days.</strong> Dispatched via DHL Nigeria
+              or GIG Logistics with live door-to-door tracking sent to your
+              email.
             </p>
             <span className="inline-block text-[11px] font-mono text-emerald-800 font-bold bg-emerald-50 px-2 py-0.5 rounded-sm">
               Standard: ₦6,500
@@ -118,8 +114,8 @@ export default function ShippingPage() {
                 1. Eligibility Window
               </strong>
               Items may be returned or exchanged within 7 days of verified
-              delivery. Pieces must be unworn, unwashed, unaltered, and accompanied
-              by original security tags and dust sleeves.
+              delivery. Pieces must be unworn, unwashed, unaltered, and
+              accompanied by original security tags and dust sleeves.
             </div>
 
             <div className="pt-3">
@@ -127,16 +123,17 @@ export default function ShippingPage() {
                 2. Size & Fit Exchanges
               </strong>
               If your chosen size does not drape exactly as desired, we offer
-              complimentary size exchanges subject to atelier stock availability.
+              complimentary size exchanges subject to atelier stock
+              availability.
             </div>
 
             <div className="pt-3">
               <strong className="text-black font-semibold block mb-1">
                 3. Refund Processing
               </strong>
-              Upon receipt and quality inspection at our atelier, approved refunds
-              are processed back to your original payment channel via Paystack
-              within 3–5 business days.
+              Upon receipt and quality inspection at our atelier, approved
+              refunds are processed back to your original payment channel via
+              Paystack within 3–5 business days.
             </div>
           </div>
         </div>
@@ -154,7 +151,7 @@ export default function ShippingPage() {
 
           <Link
             href="/products"
-            className="w-full sm:w-auto bg-black text-white px-8 py-3.5 text-xs uppercase tracking-[0.2em] font-nippo hover:bg-zinc-800 transition-colors text-center"
+            className="w-full sm:w-auto liquid-glass-pill rounded-full text-black font-bold px-8 py-3.5 text-xs uppercase tracking-[0.2em] font-nippo hover:scale-[1.02] active:scale-[0.98] transition-all text-center"
           >
             Explore Collection →
           </Link>

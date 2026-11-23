@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import GlassSurface from "@/components/GlassSurface";
 
 export default async function Hero() {
   // 1. Fetch data safely with fallback
@@ -60,9 +61,28 @@ export default async function Hero() {
 
         <Link
           href={hero.button_link}
-          className="border border-white text-white px-8 py-4 text-xs uppercase tracking-[0.2em] font-nippo hover:bg-white hover:text-black transition-all duration-300"
+          className="inline-block group cursor-pointer"
         >
-          {hero.button_text}
+          <GlassSurface
+            borderRadius={9999}
+            borderWidth={0.07}
+            brightness={50}
+            opacity={0.93}
+            blur={-100}
+            displace={0.5}
+            backgroundOpacity={-100}
+            saturation={1}
+            distortionScale={-180}
+            redOffset={0}
+            greenOffset={10}
+            blueOffset={20}
+            refraction
+            renderer="auto"
+            className="shadow-[0_8px_30px_rgba(0,0,0,0.35)] transition-all duration-300 group-hover:scale-[1.02] active:scale-[0.98]"
+            contentClassName="relative z-1 inline-flex items-center px-9 py-4 text-xs uppercase tracking-[0.2em] font-nippo text-white font-black"
+          >
+            {hero.button_text}
+          </GlassSurface>
         </Link>
       </div>
     </section>

@@ -48,7 +48,7 @@ const FAQS = [
 
 export default function FAQPage() {
   return (
-    <div className="w-full min-h-screen bg-twom-bg pt-[4.25rem] md:pt-[4.75rem] pb-16 md:pb-24 px-4 md:px-6 text-twom-body font-sans">
+    <div className="w-full min-h-screen bg-twom-bg pt-17 md:pt-19 pb-16 md:pb-24 px-4 md:px-6 text-twom-body font-sans">
       <div className="max-w-4xl mx-auto space-y-12">
         {/* Header */}
         <div>
@@ -94,7 +94,7 @@ export default function FAQPage() {
 
           <Link
             href="/products"
-            className="w-full sm:w-auto bg-black text-white px-8 py-3.5 text-xs uppercase tracking-[0.2em] font-nippo hover:bg-zinc-800 transition-colors text-center"
+            className="w-full sm:w-auto liquid-glass-pill rounded-full text-black font-bold px-8 py-3.5 text-xs uppercase tracking-[0.2em] font-nippo hover:scale-[1.02] active:scale-[0.98] transition-all text-center"
           >
             Explore Collection →
           </Link>
