@@ -60,7 +60,7 @@ export default async function Hero() {
         )}
 
         <Link
-          href={hero.button_link}
+          href="/products"
           className="inline-block group cursor-pointer"
         >
           <GlassSurface

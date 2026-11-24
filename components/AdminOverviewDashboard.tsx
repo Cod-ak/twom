@@ -1,10 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { formatNaira } from "@/lib/utils";
-import AddProductForm from "@/components/AddProductForm";
 import type { OrderStatus } from "@/lib/types";
 
 interface LowStockProduct {
@@ -85,8 +83,6 @@ export default function AdminOverviewDashboard({
   lowStockProducts,
   recentOrders,
 }: AdminOverviewDashboardProps) {
-  const [showAddForm, setShowAddForm] = useState(false);
-
   return (
     <div className="space-y-8">
       {/* 1. Executive Metrics Grid */}
@@ -224,39 +220,42 @@ export default function AdminOverviewDashboard({
         </section>
       )}
 
-      {/* 3. Quick Action: Publish New Atelier Piece (Collapsible) */}
-      <section className="bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-xs">
-        <div className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-100">
+      {/* 3. Quick Actions: Unified Publishing Hub */}
+      <section className="bg-white border border-zinc-200 rounded-xl p-6 shadow-xs">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <span className="text-[10px] uppercase tracking-[0.2em] font-mono text-twom-muted block">
               Storefront Publishing
             </span>
             <h3 className="font-zodiak text-xl text-twom-title mt-0.5">
-              Add New Atelier Piece
+              Publish New Piece or Campaign Drop
             </h3>
             <p className="text-xs text-twom-muted mt-0.5">
-              Upload high-resolution photography and catalog details to publish directly to the live store.
+              Create standalone garments or full-fit Campaign Banners with inline Apparel &amp; Accessories breakdown.
             </p>
           </div>
 
-          <button
-            type="button"
-            onClick={() => setShowAddForm((prev) => !prev)}
-            className={`px-4 py-2.5 text-xs uppercase tracking-wider font-medium rounded-lg transition-colors cursor-pointer shrink-0 ${
-              showAddForm
-                ? "bg-zinc-100 text-zinc-700 hover:bg-zinc-200 border border-zinc-200"
-                : "bg-black text-white hover:bg-zinc-800"
-            }`}
-          >
-            {showAddForm ? "✕ Close Form" : "+ Open Upload Form"}
-          </button>
-        </div>
-
-        {showAddForm && (
-          <div className="p-6 sm:p-8 bg-zinc-50/40 border-t border-zinc-100 animate-fadeIn">
-            <AddProductForm />
+          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+            <Link
+              href="/admin/products/new"
+              className="px-4 py-2.5 text-xs uppercase tracking-wider font-medium rounded-lg bg-black text-white hover:bg-zinc-800 transition-colors"
+            >
+              + Add Single Piece
+            </Link>
+            <Link
+              href="/admin/products/new?mode=banner"
+              className="px-4 py-2.5 text-xs uppercase tracking-wider font-medium rounded-lg border border-black text-black hover:bg-zinc-100 transition-colors"
+            >
+              + Create Campaign Banner
+            </Link>
+            <Link
+              href="/admin/products"
+              className="px-3 py-2.5 text-xs font-mono uppercase tracking-wider text-zinc-600 hover:text-black underline underline-offset-4 transition-colors"
+            >
+              Curate ★ Featured →
+            </Link>
           </div>
-        )}
+        </div>
       </section>
 
       {/* 4. Recent Customer Orders Snapshot */}

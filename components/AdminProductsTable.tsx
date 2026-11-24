@@ -5,55 +5,115 @@ import Image from "next/image";
 import Link from "next/link";
 import { Product } from "@/lib/types";
 import { formatNaira } from "@/lib/utils";
-import { toggleProductActive } from "@/app/admin/(dashboard)/actions";
+import {
+  toggleProductActive,
+  toggleProductFeatured,
+  deleteProduct,
+} from "@/app/admin/(dashboard)/actions";
+
+export type BannerBreakdownCounts = Record<
+  string,
+  { apparel: number; accessories: number }
+>;
 
 interface AdminProductsTableProps {
   initialProducts: Product[];
+  bannerBreakdownCounts?: BannerBreakdownCounts;
 }
+
+type ProductFilterTab =
+  | "all"
+  | "single"
+  | "banners"
+  | "featured"
+  | "archived";
+
+const FILTER_TABS: Array<{ id: ProductFilterTab; label: string }> = [
+  { id: "all", label: "All" },
+  { id: "single", label: "Single Pieces" },
+  { id: "banners", label: "Campaign Banners" },
+  { id: "featured", label: "★ Featured" },
+  { id: "archived", label: "Archived" },
+];
 
 export default function AdminProductsTable({
   initialProducts,
+  bannerBreakdownCounts = {},
 }: AdminProductsTableProps) {
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "archived">("all");
+  const [statusFilter, setStatusFilter] = useState<ProductFilterTab>("all");
   const [isPending, startTransition] = useTransition();
   const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [featuringId, setFeaturingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const filteredProducts = products.filter((p) => {
-    // 1. Status Filter
-    if (statusFilter === "active" && !p.is_active) return false;
-    if (statusFilter === "archived" && p.is_active) return false;
+  const featuredCount = products.filter(
+    (p) => !p.is_campaign_banner && p.is_featured && p.is_active,
+  ).length;
+  const bannersCount = products.filter((p) => p.is_campaign_banner).length;
 
-    // 2. Search Query
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      const name = (p.name || "").toLowerCase();
-      const cat = (p.category || "").toLowerCase();
-      const sku = (p.sku || "").toLowerCase();
-      return name.includes(q) || cat.includes(q) || sku.includes(q);
-    }
+  const filteredProducts = products
+    .filter((p) => {
+      switch (statusFilter) {
+        case "single":
+          if (p.is_campaign_banner || !p.is_active) return false;
+          break;
+        case "banners":
+          if (!p.is_campaign_banner) return false;
+          break;
+        case "featured":
+          if (p.is_campaign_banner || !p.is_featured) return false;
+          break;
+        case "archived":
+          if (p.is_active) return false;
+          break;
+        case "all":
+        default:
+          break;
+      }
 
-    return true;
-  });
+      if (search.trim()) {
+        const q = search.toLowerCase();
+        const name = (p.name || "").toLowerCase();
+        const bannerTitle = (p.banner_title || "").toLowerCase();
+        const cat = (p.category || "").toLowerCase();
+        const sku = (p.sku || "").toLowerCase();
+        return (
+          name.includes(q) ||
+          bannerTitle.includes(q) ||
+          cat.includes(q) ||
+          sku.includes(q)
+        );
+      }
 
-  const handleToggle = (productId: string, currentStatus: boolean) => {
+      return true;
+    })
+    .sort((a, b) => {
+      // When viewing Campaign Banners, show them in exact Homepage Display Order
+      if (statusFilter === "banners") {
+        return (a.banner_order ?? 0) - (b.banner_order ?? 0);
+      }
+      return 0;
+    });
+
+  const handleToggleActive = (productId: string, currentStatus: boolean) => {
     setTogglingId(productId);
-    // Optimistic UI update
     setProducts((prev) =>
       prev.map((item) =>
-        item.id === productId ? { ...item, is_active: !currentStatus } : item
-      )
+        item.id === productId ? { ...item, is_active: !currentStatus } : item,
+      ),
     );
 
     startTransition(async () => {
       const res = await toggleProductActive(productId, currentStatus);
       if (res?.error) {
-        // Revert on error
         setProducts((prev) =>
           prev.map((item) =>
-            item.id === productId ? { ...item, is_active: currentStatus } : item
-          )
+            item.id === productId
+              ? { ...item, is_active: currentStatus }
+              : item,
+          ),
         );
         alert(`Error updating product status: ${res.error}`);
       }
@@ -61,14 +121,64 @@ export default function AdminProductsTable({
     });
   };
 
+  const handleToggleFeatured = (product: Product) => {
+    if (product.is_campaign_banner) return;
+    const currentFeatured = Boolean(product.is_featured);
+    setFeaturingId(product.id);
+
+    setProducts((prev) =>
+      prev.map((item) =>
+        item.id === product.id
+          ? { ...item, is_featured: !currentFeatured }
+          : item,
+      ),
+    );
+
+    startTransition(async () => {
+      const res = await toggleProductFeatured(product.id, currentFeatured);
+      if (res?.error) {
+        setProducts((prev) =>
+          prev.map((item) =>
+            item.id === product.id
+              ? { ...item, is_featured: currentFeatured }
+              : item,
+          ),
+        );
+        alert(res.error);
+      }
+      setFeaturingId(null);
+    });
+  };
+
+  const handleDelete = (product: Product) => {
+    if (
+      !confirm(
+        `Permanently delete "${product.name}"? This cannot be undone.`
+      )
+    ) {
+      return;
+    }
+
+    setDeletingId(product.id);
+    startTransition(async () => {
+      const res = await deleteProduct(product.id);
+      if (res?.error) {
+        alert(res.error);
+      } else {
+        setProducts((prev) => prev.filter((item) => item.id !== product.id));
+      }
+      setDeletingId(null);
+    });
+  };
+
   return (
     <div className="w-full">
       {/* Search & Filter Toolbar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-6">
+      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 mb-6">
         <div className="relative flex-1 max-w-md">
           <input
             type="text"
-            placeholder="Search by name, category, or SKU..."
+            placeholder="Search by name, banner title, category, or SKU..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full px-3.5 py-2.5 text-xs border border-zinc-300 rounded-lg focus:outline-none focus:border-black bg-white"
@@ -84,23 +194,42 @@ export default function AdminProductsTable({
           )}
         </div>
 
-        <div className="flex items-center gap-2">
-          {(["all", "active", "archived"] as const).map((filter) => (
-            <button
-              key={filter}
-              type="button"
-              onClick={() => setStatusFilter(filter)}
-              className={`px-3 py-1.5 text-xs uppercase tracking-wider rounded-lg font-medium transition-colors cursor-pointer capitalize ${
-                statusFilter === filter
-                  ? "bg-black text-white font-bold"
-                  : "bg-white text-zinc-600 border border-zinc-200 hover:border-black"
-              }`}
-            >
-              {filter}
-            </button>
-          ))}
+        <div className="flex flex-wrap items-center gap-2">
+          {FILTER_TABS.map((tab) => {
+            const countLabel =
+              tab.id === "banners"
+                ? ` (${bannersCount})`
+                : tab.id === "featured"
+                ? ` (${featuredCount})`
+                : "";
+
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setStatusFilter(tab.id)}
+                className={`px-3 py-1.5 text-xs uppercase tracking-wider rounded-lg font-medium transition-colors cursor-pointer ${
+                  statusFilter === tab.id
+                    ? "bg-black text-white font-bold"
+                    : "bg-white text-zinc-600 border border-zinc-200 hover:border-black"
+                }`}
+              >
+                {tab.label}
+                {countLabel}
+              </button>
+            );
+          })}
         </div>
       </div>
+
+      {/* Helpful hint when viewing Featured */}
+      {statusFilter === "featured" && (
+        <div className="mb-4 p-3.5 bg-amber-50/70 border border-amber-200 rounded-xl text-xs text-amber-950 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <span>
+            <strong>Top Featured Row:</strong> Single Pieces starred here appear in the carousel right below your Hero video &amp; marquee. (If none are starred, the store automatically shows your 4 newest Single Pieces.)
+          </span>
+        </div>
+      )}
 
       {/* Table Container */}
       <div className="w-full overflow-x-auto bg-white border border-zinc-200 rounded-xl shadow-xs">
@@ -118,8 +247,14 @@ export default function AdminProductsTable({
           <tbody className="divide-y divide-zinc-100">
             {filteredProducts.map((product) => {
               const isTogglingThis = togglingId === product.id && isPending;
+              const isFeaturingThis = featuringId === product.id && isPending;
+              const isDeletingThis = deletingId === product.id && isPending;
               const isStockOut = product.stock_quantity <= 0;
-              const isStockLow = product.stock_quantity > 0 && product.stock_quantity < 5;
+              const isStockLow =
+                product.stock_quantity > 0 && product.stock_quantity < 5;
+              const isBanner = Boolean(product.is_campaign_banner);
+              const isFeatured = !isBanner && Boolean(product.is_featured);
+              const breakdown = bannerBreakdownCounts[product.id];
 
               return (
                 <tr
@@ -128,7 +263,7 @@ export default function AdminProductsTable({
                     !product.is_active ? "opacity-60 bg-zinc-50/30" : ""
                   }`}
                 >
-                  {/* Thumbnail & Title */}
+                  {/* Thumbnail, Title & Role Badges */}
                   <td className="py-3.5 px-4">
                     <div className="flex items-center gap-3">
                       <div className="relative w-12 h-14 rounded-lg bg-zinc-100 overflow-hidden shrink-0 border border-zinc-200/80">
@@ -141,15 +276,41 @@ export default function AdminProductsTable({
                         />
                       </div>
                       <div className="min-w-0">
-                        <Link
-                          href={`/admin/products/${product.id}`}
-                          className="font-bold text-black text-sm hover:underline block truncate"
-                        >
-                          {product.name}
-                        </Link>
-                        <span className="text-[11px] font-mono text-zinc-400 block mt-0.5">
-                          {product.sku || "NO-SKU"}
-                        </span>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <Link
+                            href={`/admin/products/${product.id}`}
+                            className="font-bold text-black text-sm hover:underline truncate"
+                          >
+                            {product.name}
+                          </Link>
+                          {isBanner && (
+                            <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-zinc-900 text-white font-semibold">
+                              Banner #{product.banner_order ?? 0}
+                            </span>
+                          )}
+                          {isFeatured && (
+                            <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#ffce27] text-black font-bold border border-black/15">
+                              ★ Featured
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="flex items-center gap-2 flex-wrap mt-0.5">
+                          <span className="text-[11px] font-mono text-zinc-400">
+                            {product.sku || "NO-SKU"}
+                          </span>
+                          {isBanner && product.banner_title && (
+                            <span className="text-[10px] font-mono text-zinc-600 bg-zinc-100 px-1.5 py-0.5 rounded">
+                              Overlay: &ldquo;{product.banner_title}&rdquo;
+                            </span>
+                          )}
+                          {isBanner && breakdown && (
+                            <span className="text-[10px] font-mono text-zinc-500">
+                              Apparel ({breakdown.apparel}) · Accessories (
+                              {breakdown.accessories})
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </td>
@@ -205,6 +366,27 @@ export default function AdminProductsTable({
                   {/* Action Buttons */}
                   <td className="py-3.5 px-4 text-right">
                     <div className="inline-flex items-center gap-2">
+                      {/* One-Click ★ Featured Pin (Single Pieces only) */}
+                      {!isBanner && (
+                        <button
+                          type="button"
+                          disabled={isFeaturingThis}
+                          onClick={() => handleToggleFeatured(product)}
+                          title={
+                            isFeatured
+                              ? "Unpin from Top Featured Row"
+                              : "Pin to Top Featured Row"
+                          }
+                          className={`px-2.5 py-1.5 rounded-md border font-bold transition-colors cursor-pointer disabled:opacity-50 ${
+                            isFeatured
+                              ? "bg-[#ffce27] border-black/20 text-black hover:bg-[#f2c11d]"
+                              : "bg-white border-zinc-200 text-zinc-400 hover:border-black hover:text-black"
+                          }`}
+                        >
+                          ★
+                        </button>
+                      )}
+
                       {/* View Storefront */}
                       {product.is_active && (
                         <Link
@@ -229,8 +411,10 @@ export default function AdminProductsTable({
                       {/* Soft Delete / Restore Toggle Button */}
                       <button
                         type="button"
-                        disabled={isTogglingThis}
-                        onClick={() => handleToggle(product.id, product.is_active)}
+                        disabled={isTogglingThis || isDeletingThis}
+                        onClick={() =>
+                          handleToggleActive(product.id, product.is_active)
+                        }
                         className={`px-3 py-1.5 rounded-md border font-medium transition-colors cursor-pointer disabled:opacity-50 ${
                           product.is_active
                             ? "border-red-200 text-red-600 hover:bg-red-50"
@@ -243,6 +427,18 @@ export default function AdminProductsTable({
                           ? "Archive"
                           : "Restore"}
                       </button>
+
+                      {/* Permanent Delete Button (Archived items only) */}
+                      {!product.is_active && (
+                        <button
+                          type="button"
+                          disabled={isDeletingThis || isTogglingThis}
+                          onClick={() => handleDelete(product)}
+                          className="px-3 py-1.5 rounded-md border border-red-300 bg-red-50 text-red-700 hover:bg-red-600 hover:text-white font-semibold transition-colors cursor-pointer disabled:opacity-50"
+                        >
+                          {isDeletingThis ? "Deleting..." : "Delete"}
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>

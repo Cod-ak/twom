@@ -11,33 +11,62 @@ import {
 } from "@/lib/showcase-catalog";
 
 interface CategoryShowcaseProps {
-  dbProducts: Product[];
+  dbProducts?: Product[];
+  apparelProducts?: Product[];
+  accessoriesProducts?: Product[];
+  isCuratedBanner?: boolean;
   tabs?: [string, string];
 }
 
 export default function CategoryShowcase({
-  dbProducts,
-  tabs = ["TEES & TANKS", "PANTS"],
+  dbProducts = [],
+  apparelProducts,
+  accessoriesProducts,
+  isCuratedBanner = false,
+  tabs = ["APPAREL", "ACCESSORIES"],
 }: CategoryShowcaseProps) {
-  const [activeTab, setActiveTab] = useState<string>(tabs[0]);
+  const resolveTabItems = (tabIndex: 0 | 1): ShowcaseItem[] => {
+    if (isCuratedBanner) {
+      const list = tabIndex === 0 ? apparelProducts : accessoriesProducts;
+      return (list || []) as ShowcaseItem[];
+    }
 
-  // Filter live DB products by active tab, or fall back to showcase catalog previews
-  const getDisplayedItems = (): ShowcaseItem[] => {
-    const dbMatches = dbProducts.filter((p) =>
-      matchesCategoryTab(p.category, activeTab),
+    const tabLabel = tabs[tabIndex];
+    const dbMatches = dbProducts.filter(
+      (p) => !p.is_campaign_banner && matchesCategoryTab(p.category, tabLabel),
     );
-
     if (dbMatches.length > 0) return dbMatches as ShowcaseItem[];
 
-    return getFallbackItemsForCategory(activeTab);
+    return getFallbackItemsForCategory(tabLabel);
   };
 
-  const displayedItems = getDisplayedItems();
+  const apparelItems = resolveTabItems(0);
+  const accessoriesItems = resolveTabItems(1);
+
+  const [selectedTab, setSelectedTab] = useState<string>(() =>
+    apparelItems.length > 0 ? tabs[0] : tabs[1],
+  );
+
+  // If neither tab has items on a newly created banner, preserve exact 24px spacing before next banner
+  if (apparelItems.length === 0 && accessoriesItems.length === 0) {
+    return <div className="h-6" aria-hidden="true" />;
+  }
+
+  // Ensure active tab never points to an empty/muted tab
+  let effectiveActiveTab = selectedTab;
+  if (effectiveActiveTab === tabs[0] && apparelItems.length === 0) {
+    effectiveActiveTab = tabs[1];
+  } else if (effectiveActiveTab === tabs[1] && accessoriesItems.length === 0) {
+    effectiveActiveTab = tabs[0];
+  }
+
+  const displayedItems =
+    effectiveActiveTab === tabs[0] ? apparelItems : accessoriesItems;
 
   return (
-    <section className="w-full max-w-7xl mx-auto px-4 md:px-6 pt-4 pb-0 md:py-20">
+    <section className="w-full max-w-7xl mx-auto px-4 md:px-6 pt-6 pb-4">
       {/* Liquid Glass Category Switcher Dock */}
-      <div className="flex items-center mb-6 md:mb-10">
+      <div className="flex items-center mb-6">
         <GlassSurface
           borderRadius={9999}
           borderWidth={0.07}
@@ -56,17 +85,26 @@ export default function CategoryShowcase({
           className="shadow-[0_8px_30px_rgba(0,0,0,0.08)]"
           contentClassName="relative z-1 inline-flex items-center p-1.5 rounded-full gap-1 sm:gap-2"
         >
-          {tabs.map((tab) => {
-            const isActive = activeTab === tab;
+          {tabs.map((tab, idx) => {
+            const hasItems =
+              (idx === 0 ? apparelItems.length : accessoriesItems.length) > 0;
+            const isActive = effectiveActiveTab === tab && hasItems;
+
             return (
               <button
                 key={tab}
                 type="button"
-                onClick={() => setActiveTab(tab)}
-                className={`relative px-4 sm:px-6 py-2 sm:py-2.5 rounded-full font-nippo italic uppercase text-xs sm:text-sm md:text-base tracking-wider transition-all duration-300 cursor-pointer ${
-                  isActive
-                    ? "bg-[#ffce27] text-black font-black shadow-[0_4px_14px_rgba(255,206,39,0.5)]"
-                    : "text-zinc-600 hover:text-twom-title font-bold hover:bg-white/40"
+                disabled={!hasItems}
+                aria-disabled={!hasItems}
+                onClick={() => {
+                  if (hasItems) setSelectedTab(tab);
+                }}
+                className={`relative px-4 sm:px-6 py-2 sm:py-2.5 rounded-full font-nippo italic uppercase text-xs sm:text-sm md:text-base tracking-wider transition-all duration-300 ${
+                  !hasItems
+                    ? "text-zinc-400 opacity-35 cursor-not-allowed pointer-events-none font-bold"
+                    : isActive
+                    ? "bg-[#ffce27] text-black font-black shadow-[0_4px_14px_rgba(255,206,39,0.5)] cursor-pointer"
+                    : "text-zinc-600 hover:text-twom-title font-bold hover:bg-white/40 cursor-pointer"
                 }`}
               >
                 {tab}

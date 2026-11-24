@@ -13,7 +13,6 @@ export default function HeroManagerForm({ initialHero }: HeroManagerFormProps) {
   const [headline, setHeadline] = useState(initialHero.headline || "Find your fit.");
   const [subheadline, setSubheadline] = useState(initialHero.subheadline || "");
   const [buttonText, setButtonText] = useState(initialHero.button_text || "Explore styles");
-  const [buttonLink, setButtonLink] = useState(initialHero.button_link || "/products");
   const [videoUrl, setVideoUrl] = useState(initialHero.video_url || "");
   const [posterUrl, setPosterUrl] = useState(initialHero.poster_url || "");
 
@@ -55,7 +54,6 @@ export default function HeroManagerForm({ initialHero }: HeroManagerFormProps) {
     formData.set("headline", headline);
     if (subheadline) formData.set("subheadline", subheadline);
     formData.set("button_text", buttonText);
-    formData.set("button_link", buttonLink);
     formData.set("video_url", videoUrl);
     formData.set("poster_url", posterUrl);
     if (videoFile) formData.set("video_file", videoFile);
@@ -139,34 +137,22 @@ export default function HeroManagerForm({ initialHero }: HeroManagerFormProps) {
             />
           </div>
 
-          {/* CTA Button Text & Link */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs uppercase tracking-wider font-mono text-zinc-600 mb-2">
-                CTA Button Text *
-              </label>
-              <input
-                type="text"
-                required
-                value={buttonText}
-                onChange={(e) => setButtonText(e.target.value)}
-                placeholder="Explore styles"
-                className="w-full px-4 py-2.5 border border-zinc-300 text-xs focus:outline-none focus:border-black transition-colors"
-              />
-            </div>
-            <div>
-              <label className="block text-xs uppercase tracking-wider font-mono text-zinc-600 mb-2">
-                CTA Button Destination Link *
-              </label>
-              <input
-                type="text"
-                required
-                value={buttonLink}
-                onChange={(e) => setButtonLink(e.target.value)}
-                placeholder="/products"
-                className="w-full px-4 py-2.5 border border-zinc-300 text-xs focus:outline-none focus:border-black transition-colors font-mono"
-              />
-            </div>
+          {/* CTA Button Text */}
+          <div>
+            <label className="block text-xs uppercase tracking-wider font-mono text-zinc-600 mb-2">
+              CTA Button Text *
+            </label>
+            <input
+              type="text"
+              required
+              value={buttonText}
+              onChange={(e) => setButtonText(e.target.value)}
+              placeholder="Explore styles"
+              className="w-full px-4 py-2.5 border border-zinc-300 text-xs focus:outline-none focus:border-black transition-colors"
+            />
+            <p className="text-[11px] text-zinc-400 mt-1 font-mono">
+              Button automatically routes shoppers to /products.
+            </p>
           </div>
 
           {/* Video Configuration */}

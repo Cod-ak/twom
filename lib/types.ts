@@ -27,6 +27,10 @@ export interface Product {
   is_active: boolean;
   created_at: string;
   is_new?: boolean;
+  is_campaign_banner?: boolean;
+  banner_title?: string | null;
+  banner_order?: number;
+  is_featured?: boolean;
 }
 
 export type OrderStatus = "pending" | "paid" | "processing" | "shipped" | "delivered" | "cancelled" | "refunded" | "failed";
@@ -115,4 +119,19 @@ export interface PromoCode {
   expires_at: string | null;
   is_active: boolean;
   created_at: string;
+}
+
+export interface CampaignBannerItemRecord {
+  id: string;
+  banner_product_id: string;
+  item_product_id: string;
+  tab_type: "apparel" | "accessories";
+  sort_order: number;
+  created_at: string;
+  item_product?: Product;
+}
+
+export interface CampaignBannerProduct extends Product {
+  apparel_items: Product[];
+  accessories_items: Product[];
 }

@@ -13,27 +13,237 @@ export async function adminSignOut() {
   redirect("/admin/login");
 }
 
-export async function addProduct(formData: FormData) {
-  const supabase = await createClient();
+export interface BreakdownManifestItem {
+  kind: "existing" | "new";
+  tab_type: "apparel" | "accessories";
+  sort_order: number;
+  product_id?: string;
+  client_key?: string;
+  name?: string;
+  category?: string;
+  price?: string;
+  stock?: string;
+  description?: string;
+}
 
-  // 1. Zero-Trust Auth: Verify user is logged in AND is an admin
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized" };
+function buildProductSlug(name: string, extraSalt = ""): string {
+  const baseSlug = name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)+/g, "");
+  const timeSalt = Date.now().toString().slice(-4);
+  return `${baseSlug || "piece"}-${timeSalt}${extraSalt}`;
+}
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
+async function uploadProductImages(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  imageFiles: File[],
+  slugPrefix: string,
+): Promise<{ publicUrls?: string[]; error?: string }> {
+  const publicUrls: string[] = [];
+  for (let i = 0; i < imageFiles.length; i++) {
+    const file = imageFiles[i];
+    const fileExt = (file.name.split(".").pop() || "jpg")
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, "");
+    const fileName = `${Date.now()}-${i}-${slugPrefix}.${fileExt || "jpg"}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("product-images")
+      .upload(fileName, file, {
+        contentType: file.type || "image/jpeg",
+        upsert: true,
+      });
+
+    if (uploadError) {
+      return { error: `Failed to upload image ${i + 1}: ${uploadError.message}` };
+    }
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from("product-images").getPublicUrl(fileName);
+
+    publicUrls.push(publicUrl);
+  }
+
+  return { publicUrls };
+}
+
+async function insertProductRecord(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  payload: Record<string, unknown>,
+): Promise<{ id?: string; error?: string }> {
+  const attemptPayload = { ...payload };
+  let { data, error: dbError } = await supabase
+    .from("products")
+    .insert(attemptPayload)
+    .select("id")
     .single();
 
-  if (profile?.role !== "admin") return { error: "Forbidden: Admin access required." };
+  if (dbError && dbError.message.includes("images")) {
+    delete attemptPayload.images;
+    const retry = await supabase
+      .from("products")
+      .insert(attemptPayload)
+      .select("id")
+      .single();
+    data = retry.data;
+    dbError = retry.error;
+  }
+
+  if (dbError) return { error: "Database error: " + dbError.message };
+  return { id: data?.id };
+}
+
+async function syncBannerBreakdownItems(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  bannerProductId: string,
+  formData: FormData,
+  replaceExisting: boolean,
+): Promise<{ error?: string }> {
+  const manifestRaw = formData.get("breakdown_manifest") as string | null;
+  if (manifestRaw === null) return {};
+
+  let manifest: BreakdownManifestItem[] = [];
+  try {
+    manifest = JSON.parse(manifestRaw);
+  } catch {
+    return { error: "Invalid breakdown payload format." };
+  }
+
+  // Validate all inline new items before writing any child products
+  for (let i = 0; i < manifest.length; i++) {
+    const entry = manifest[i];
+    if (entry.kind === "new") {
+      const itemName = (entry.name || "").trim();
+      const itemCategory = (entry.category || "").trim();
+      const itemPrice = parseFloat(entry.price || "");
+      const files = (
+        formData.getAll(`item_images_${entry.client_key}`) as File[]
+      ).filter((f) => f && f.size > 0);
+
+      if (!itemName || !itemCategory || Number.isNaN(itemPrice) || itemPrice < 0) {
+        return {
+          error: `Breakdown item "${itemName || `#${i + 1}`}" is missing a valid name, category, or price.`,
+        };
+      }
+      if (!PRODUCT_CATEGORIES.includes(itemCategory as ProductCategory)) {
+        return { error: `Invalid category "${itemCategory}" on breakdown item "${itemName}".` };
+      }
+      if (files.length === 0) {
+        return {
+          error: `Please upload at least one image for breakdown item "${itemName}".`,
+        };
+      }
+    }
+  }
+
+  const rowsToInsert: {
+    banner_product_id: string;
+    item_product_id: string;
+    tab_type: "apparel" | "accessories";
+    sort_order: number;
+  }[] = [];
+  const seenKeys = new Set<string>();
+
+  for (let i = 0; i < manifest.length; i++) {
+    const entry = manifest[i];
+    let resolvedItemId = entry.product_id || "";
+
+    if (entry.kind === "new") {
+      const itemName = (entry.name || "").trim();
+      const itemCategory = (entry.category || "").trim();
+      const itemDescription = (entry.description || "").trim();
+      const priceInKobo = Math.round(parseFloat(entry.price || "0") * 100);
+      const stock = parseInt(entry.stock || "0", 10) || 0;
+      const slug = buildProductSlug(itemName, `-${i}`);
+      const files = (
+        formData.getAll(`item_images_${entry.client_key}`) as File[]
+      ).filter((f) => f && f.size > 0);
+
+      const uploadRes = await uploadProductImages(supabase, files, slug);
+      if (uploadRes.error || !uploadRes.publicUrls?.length) {
+        return { error: uploadRes.error || `Failed to upload photos for "${itemName}".` };
+      }
+
+      const insertRes = await insertProductRecord(supabase, {
+        name: itemName,
+        slug,
+        category: itemCategory,
+        description: itemDescription || null,
+        price: priceInKobo,
+        image_url: uploadRes.publicUrls[0],
+        images: uploadRes.publicUrls,
+        stock_quantity: stock,
+        is_active: true,
+        is_campaign_banner: false,
+        is_featured: false,
+        sku: `TWOM-${Date.now().toString().slice(-6)}-${i}`,
+      });
+
+      if (insertRes.error || !insertRes.id) {
+        return { error: insertRes.error || `Failed to create "${itemName}".` };
+      }
+      resolvedItemId = insertRes.id;
+    }
+
+    if (resolvedItemId && resolvedItemId !== bannerProductId) {
+      const dedupeKey = `${entry.tab_type}:${resolvedItemId}`;
+      if (!seenKeys.has(dedupeKey)) {
+        seenKeys.add(dedupeKey);
+        rowsToInsert.push({
+          banner_product_id: bannerProductId,
+          item_product_id: resolvedItemId,
+          tab_type: entry.tab_type,
+          sort_order: entry.sort_order ?? i,
+        });
+      }
+    }
+  }
+
+  if (replaceExisting) {
+    const { error: deleteErr } = await supabase
+      .from("campaign_banner_items")
+      .delete()
+      .eq("banner_product_id", bannerProductId);
+    if (deleteErr) {
+      return { error: `Failed to refresh banner breakdown items: ${deleteErr.message}` };
+    }
+  }
+
+  if (rowsToInsert.length > 0) {
+    const { error: itemsErr } = await supabase
+      .from("campaign_banner_items")
+      .insert(rowsToInsert);
+    if (itemsErr) {
+      return { error: `Failed to link banner breakdown items: ${itemsErr.message}` };
+    }
+  }
+
+  return {};
+}
+
+export async function addProduct(formData: FormData) {
+  const { supabase, error } = await verifyAdmin();
+  if (error) return { error };
 
   // 2. Extract Form Data
-  const name = formData.get("name") as string;
-  const category = formData.get("category") as string;
-  const description = formData.get("description") as string;
-  const priceString = formData.get("price") as string; // e.g., "25000"
+  const name = (formData.get("name") as string)?.trim();
+  const category = (formData.get("category") as string)?.trim();
+  const description = (formData.get("description") as string)?.trim() || "";
+  const priceString = formData.get("price") as string;
   const stockString = formData.get("stock") as string;
+  const mode = (formData.get("mode") as string) === "banner" ? "banner" : "single";
+  const isCampaignBanner = mode === "banner";
+  const bannerTitle = isCampaignBanner
+    ? ((formData.get("banner_title") as string)?.trim() || null)
+    : null;
+  const bannerOrder = isCampaignBanner
+    ? parseInt((formData.get("banner_order") as string) || "0", 10) || 0
+    : 0;
+  // Single Pieces only may be pinned to the Top Featured Row
+  const isFeatured =
+    !isCampaignBanner && formData.get("is_featured") === "true";
 
   // Extract multiple files (with fallback to single 'image')
   const rawFiles = formData.getAll("images") as File[];
@@ -47,85 +257,94 @@ export async function addProduct(formData: FormData) {
     return { error: "Missing required fields or at least one image." };
   }
 
-  // Validate category against allowed list
   if (!PRODUCT_CATEGORIES.includes(category as ProductCategory)) {
     return { error: `Invalid category selected: ${category}` };
   }
 
-  // 3. Convert Naira to Kobo (Multiply by 100 with rounding to prevent float precision issues)
-  const priceInKobo = Math.round(parseFloat(priceString) * 100);
-  const stock = parseInt(stockString) || 0;
-
-  // 4. Generate a unique Slug (e.g., "heavy-coat-1234")
-  const baseSlug = name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)+/g, "");
-  const slug = `${baseSlug || "piece"}-${Date.now().toString().slice(-4)}`;
-
-  // 5. Upload all Images to Supabase Storage
-  const publicUrls: string[] = [];
-  for (let i = 0; i < imageFiles.length; i++) {
-    const file = imageFiles[i];
-    const fileExt = (file.name.split(".").pop() || "jpg")
-      .toLowerCase()
-      .replace(/[^a-z0-9]/g, "");
-    const fileName = `${Date.now()}-${i}-${slug}.${fileExt || "jpg"}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from("product-images")
-      .upload(fileName, file, {
-        contentType: file.type || "image/jpeg",
-        upsert: true,
-      });
-
-    if (uploadError) {
-      return { error: `Failed to upload image ${i + 1}: ${uploadError.message}` };
+  // Validate breakdown items BEFORE uploading the main product so failed validation doesn't leave partial uploads
+  if (isCampaignBanner) {
+    const manifestRaw = formData.get("breakdown_manifest") as string | null;
+    if (manifestRaw) {
+      try {
+        const manifest: BreakdownManifestItem[] = JSON.parse(manifestRaw);
+        for (let i = 0; i < manifest.length; i++) {
+          const entry = manifest[i];
+          if (entry.kind === "new") {
+            const itemName = (entry.name || "").trim();
+            const itemCategory = (entry.category || "").trim();
+            const itemPrice = parseFloat(entry.price || "");
+            const files = (
+              formData.getAll(`item_images_${entry.client_key}`) as File[]
+            ).filter((f) => f && f.size > 0);
+            if (!itemName || !itemCategory || Number.isNaN(itemPrice) || itemPrice < 0 || files.length === 0) {
+              return {
+                error: `Complete all required fields and upload at least 1 photo for "${itemName || `Breakdown item #${i + 1}`}".`,
+              };
+            }
+          }
+        }
+      } catch {
+        return { error: "Invalid breakdown payload format." };
+      }
     }
-
-    const { data: { publicUrl } } = supabase.storage
-      .from("product-images")
-      .getPublicUrl(fileName);
-
-    publicUrls.push(publicUrl);
   }
 
+  const priceInKobo = Math.round(parseFloat(priceString) * 100);
+  const stock = parseInt(stockString, 10) || 0;
+  const slug = buildProductSlug(name);
+
+  // 5. Upload all Images to Supabase Storage
+  const uploadRes = await uploadProductImages(supabase, imageFiles, slug);
+  if (uploadRes.error || !uploadRes.publicUrls?.length) {
+    return { error: uploadRes.error || "Image upload failed." };
+  }
+
+  const publicUrls = uploadRes.publicUrls;
   const primaryCover = publicUrls[0];
 
-  // 6. Insert Product into Database with fail-safe backwards compatibility
-  const insertPayload: Record<string, unknown> = {
+  // 6. Insert Product into Database
+  const insertRes = await insertProductRecord(supabase, {
     name,
     slug,
     category,
-    description,
+    description: description || null,
     price: priceInKobo,
     image_url: primaryCover,
     images: publicUrls,
     stock_quantity: stock,
     is_active: true,
+    is_campaign_banner: isCampaignBanner,
+    banner_title: bannerTitle,
+    banner_order: bannerOrder,
+    is_featured: isFeatured,
     sku: `TWOM-${Date.now().toString().slice(-6)}`,
-  };
+  });
 
-  let { error: dbError } = await supabase
-    .from("products")
-    .insert(insertPayload);
-
-  // If the user hasn't run the ALTER TABLE command yet in Supabase,
-  // Postgres returns column "images" does not exist. We retry gracefully with image_url only.
-  if (dbError && dbError.message.includes("images")) {
-    delete insertPayload.images;
-    const retry = await supabase.from("products").insert(insertPayload);
-    dbError = retry.error;
+  if (insertRes.error || !insertRes.id) {
+    return { error: insertRes.error || "Failed to save product." };
   }
 
-  if (dbError) return { error: "Database error: " + dbError.message };
+  // 7. Create & link Campaign Banner breakdown pieces (Apparel & Accessories)
+  if (isCampaignBanner) {
+    const syncRes = await syncBannerBreakdownItems(
+      supabase,
+      insertRes.id,
+      formData,
+      false,
+    );
+    if (syncRes.error) {
+      return { error: syncRes.error };
+    }
+  }
 
-  // 7. Tell Next.js to refresh the storefront cache immediately!
+  // 8. Refresh storefront & admin caches
   revalidatePath("/");
   revalidatePath("/products");
   revalidatePath(`/products/${slug}`);
+  revalidatePath("/admin");
+  revalidatePath("/admin/products");
 
-  return { success: true };
+  return { success: true, productId: insertRes.id, slug };
 }
 
 // ── Courier tracking URL map (no API, just deep-linking) ──────────────────
@@ -354,21 +573,8 @@ export async function updateOrderStatus(orderId: string, newStatus: OrderStatus)
 }
 
 export async function toggleProductActive(productId: string, currentStatus: boolean) {
-  const supabase = await createClient();
-
-  // 1. Verify Admin (Zero-Trust)
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized" };
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-
-  if (profile?.role !== "admin") return { error: "Forbidden: Admin access required." };
+  const { supabase, error: authError } = await verifyAdmin();
+  if (authError) return { error: authError };
 
   const { error } = await supabase
     .from("products")
@@ -379,35 +585,134 @@ export async function toggleProductActive(productId: string, currentStatus: bool
 
   revalidatePath("/");
   revalidatePath("/products");
+  revalidatePath("/admin");
+  revalidatePath("/admin/products");
+  return { success: true };
+}
+
+export async function toggleProductFeatured(productId: string, currentFeatured: boolean) {
+  const { supabase, error: authError } = await verifyAdmin();
+  if (authError) return { error: authError };
+
+  const { data: existing } = await supabase
+    .from("products")
+    .select("is_campaign_banner")
+    .eq("id", productId)
+    .single();
+
+  if (existing?.is_campaign_banner) {
+    return { error: "Only Single Pieces can be pinned to the Top Featured Row." };
+  }
+
+  const { error } = await supabase
+    .from("products")
+    .update({ is_featured: !currentFeatured })
+    .eq("id", productId);
+
+  if (error) return { error: error.message };
+
+  revalidatePath("/");
+  revalidatePath("/admin");
+  revalidatePath("/admin/products");
+  return { success: true };
+}
+
+export async function deleteProduct(productId: string) {
+  const { supabase, error: authError } = await verifyAdmin();
+  if (authError) return { error: authError };
+
+  // 1. Fetch product to confirm it is archived and collect storage URLs
+  const { data: existing, error: fetchError } = await supabase
+    .from("products")
+    .select("id, is_active, image_url, images")
+    .eq("id", productId)
+    .maybeSingle();
+
+  if (fetchError || !existing) {
+    return { error: "Product not found." };
+  }
+
+  if (existing.is_active) {
+    return { error: "Archive this piece first before permanently deleting it." };
+  }
+
+  // 2. Guard past order history (order_items references products without ON DELETE CASCADE)
+  const { data: orderItems } = await supabaseAdmin
+    .from("order_items")
+    .select("id")
+    .eq("product_id", productId)
+    .limit(1);
+
+  if (orderItems && orderItems.length > 0) {
+    return {
+      error:
+        "This piece has existing customer orders and cannot be permanently deleted. Keep it Archived so order history stays intact.",
+    };
+  }
+
+  // 3. Delete row (campaign_banner_items cascades automatically)
+  const { error: dbError } = await supabase
+    .from("products")
+    .delete()
+    .eq("id", productId);
+
+  if (dbError) {
+    if (dbError.code === "23503") {
+      return {
+        error:
+          "This piece is referenced by existing customer orders and must stay Archived.",
+      };
+    }
+    return { error: `Failed to delete product: ${dbError.message}` };
+  }
+
+  // 4. Best-effort cleanup of uploaded product-images storage objects
+  const BUCKET_MARKER = "/storage/v1/object/public/product-images/";
+  const allUrls = new Set<string>([
+    ...(Array.isArray(existing.images) ? existing.images : []),
+    ...(existing.image_url ? [existing.image_url] : []),
+  ]);
+  const storagePaths: string[] = [];
+  for (const url of allUrls) {
+    const idx = url.indexOf(BUCKET_MARKER);
+    if (idx !== -1) {
+      const path = decodeURIComponent(url.slice(idx + BUCKET_MARKER.length));
+      if (path) storagePaths.push(path);
+    }
+  }
+  if (storagePaths.length > 0) {
+    await supabaseAdmin.storage.from("product-images").remove(storagePaths);
+  }
+
+  revalidatePath("/");
+  revalidatePath("/products");
+  revalidatePath("/admin");
   revalidatePath("/admin/products");
   return { success: true };
 }
 
 export async function updateProduct(productId: string, formData: FormData) {
-  const supabase = await createClient();
-
-  // 1. Verify Admin (Zero-Trust)
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized" };
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-
-  if (profile?.role !== "admin") return { error: "Forbidden: Admin access required." };
+  const { supabase, error: authError } = await verifyAdmin();
+  if (authError) return { error: authError };
 
   // 2. Extract fields
-  const name = formData.get("name") as string;
-  const category = formData.get("category") as string;
-  const description = formData.get("description") as string;
+  const name = (formData.get("name") as string)?.trim();
+  const category = (formData.get("category") as string)?.trim();
+  const description = (formData.get("description") as string)?.trim() || "";
   const priceString = formData.get("price") as string;
   const stockString = formData.get("stock") as string;
   const isActiveString = formData.get("is_active") as string;
   const is_active = isActiveString === "true" || isActiveString === "on";
+  const mode = (formData.get("mode") as string) === "banner" ? "banner" : "single";
+  const is_campaign_banner = mode === "banner";
+  const banner_title = is_campaign_banner
+    ? ((formData.get("banner_title") as string)?.trim() || null)
+    : null;
+  const banner_order = is_campaign_banner
+    ? parseInt((formData.get("banner_order") as string) || "0", 10) || 0
+    : 0;
+  // Single Pieces only may be pinned to the Top Featured Row
+  const is_featured = !is_campaign_banner && formData.get("is_featured") === "true";
 
   if (!name || !category || !priceString) {
     return { error: "Missing required fields (name, category, price)." };
@@ -417,73 +722,101 @@ export async function updateProduct(productId: string, formData: FormData) {
     return { error: `Invalid category selected: ${category}` };
   }
 
-  const priceInKobo = Math.round(parseFloat(priceString) * 100);
-  const stock = parseInt(stockString) || 0;
+  // Validate breakdown items before touching DB or storage
+  if (is_campaign_banner) {
+    const manifestRaw = formData.get("breakdown_manifest") as string | null;
+    if (manifestRaw) {
+      try {
+        const manifest: BreakdownManifestItem[] = JSON.parse(manifestRaw);
+        for (let i = 0; i < manifest.length; i++) {
+          const entry = manifest[i];
+          if (entry.kind === "new") {
+            const itemName = (entry.name || "").trim();
+            const itemCategory = (entry.category || "").trim();
+            const itemPrice = parseFloat(entry.price || "");
+            const files = (
+              formData.getAll(`item_images_${entry.client_key}`) as File[]
+            ).filter((f) => f && f.size > 0);
+            if (!itemName || !itemCategory || Number.isNaN(itemPrice) || itemPrice < 0 || files.length === 0) {
+              return {
+                error: `Complete all required fields and upload at least 1 photo for "${itemName || `Breakdown item #${i + 1}`}".`,
+              };
+            }
+          }
+        }
+      } catch {
+        return { error: "Invalid breakdown payload format." };
+      }
+    }
+  }
 
-  // 3. Handle optional image uploads
+  const priceInKobo = Math.round(parseFloat(priceString) * 100);
+  const stock = parseInt(stockString, 10) || 0;
+
+  // 3. Handle optional replacement image uploads
   const rawFiles = formData.getAll("images") as File[];
   const imageFiles = rawFiles.filter((f) => f && f.size > 0);
 
   const updatePayload: Record<string, unknown> = {
     name,
     category,
-    description,
+    description: description || null,
     price: priceInKobo,
     stock_quantity: stock,
     is_active,
+    is_campaign_banner,
+    banner_title,
+    banner_order,
+    is_featured,
   };
 
   if (imageFiles.length > 0) {
-    const publicUrls: string[] = [];
-    const baseSlug = name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)+/g, "");
-
-    for (let i = 0; i < imageFiles.length; i++) {
-      const file = imageFiles[i];
-      const fileExt = (file.name.split(".").pop() || "jpg")
-        .toLowerCase()
-        .replace(/[^a-z0-9]/g, "");
-      const fileName = `${Date.now()}-${i}-${baseSlug || "piece"}.${fileExt || "jpg"}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("product-images")
-        .upload(fileName, file, {
-          contentType: file.type || "image/jpeg",
-          upsert: true,
-        });
-
-      if (uploadError) {
-        return { error: `Failed to upload image ${i + 1}: ${uploadError.message}` };
-      }
-
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from("product-images").getPublicUrl(fileName);
-
-      publicUrls.push(publicUrl);
+    const uploadRes = await uploadProductImages(
+      supabase,
+      imageFiles,
+      buildProductSlug(name),
+    );
+    if (uploadRes.error || !uploadRes.publicUrls?.length) {
+      return { error: uploadRes.error || "Image upload failed." };
     }
 
-    updatePayload.image_url = publicUrls[0];
-    updatePayload.images = publicUrls;
+    updatePayload.image_url = uploadRes.publicUrls[0];
+    updatePayload.images = uploadRes.publicUrls;
   }
 
+  const attemptPayload = { ...updatePayload };
   let { error: dbError } = await supabase
     .from("products")
-    .update(updatePayload)
+    .update(attemptPayload)
     .eq("id", productId);
 
   if (dbError && dbError.message.includes("images")) {
-    delete updatePayload.images;
-    const retry = await supabase.from("products").update(updatePayload).eq("id", productId);
+    delete attemptPayload.images;
+    const retry = await supabase.from("products").update(attemptPayload).eq("id", productId);
     dbError = retry.error;
   }
 
   if (dbError) return { error: "Database error: " + dbError.message };
 
+  if (is_campaign_banner) {
+    const syncRes = await syncBannerBreakdownItems(
+      supabase,
+      productId,
+      formData,
+      true,
+    );
+    if (syncRes.error) return { error: syncRes.error };
+  } else {
+    // Switched back to Single Piece: clear any prior banner item associations cleanly
+    await supabase
+      .from("campaign_banner_items")
+      .delete()
+      .eq("banner_product_id", productId);
+  }
+
   revalidatePath("/");
   revalidatePath("/products");
+  revalidatePath("/admin");
   revalidatePath("/admin/products");
   revalidatePath(`/admin/products/${productId}`);
 
@@ -498,7 +831,8 @@ export async function updateHeroSection(formData: FormData) {
   const headline = (formData.get("headline") as string)?.trim();
   const subheadline = (formData.get("subheadline") as string)?.trim() || null;
   const button_text = (formData.get("button_text") as string)?.trim() || "Explore styles";
-  const button_link = (formData.get("button_link") as string)?.trim() || "/products";
+  // Locked permanently to /products per admin design requirements
+  const button_link = "/products";
   let video_url = (formData.get("video_url") as string)?.trim() || "";
   let poster_url = (formData.get("poster_url") as string)?.trim() || "";
 

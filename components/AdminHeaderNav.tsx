@@ -21,7 +21,7 @@ const ADMIN_NAV_ITEMS = [
     id: "products",
     href: "/admin/products",
     label: "All Products",
-    description: "Piece catalogue, pricing & stock quantities",
+    description: "Piece catalogue, campaign banners & featured pinning",
     badge: "Inventory",
   },
   {

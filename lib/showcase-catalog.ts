@@ -327,6 +327,11 @@ const SHOWCASE_GROUPS: Array<{
   items: ShowcaseItem[];
 }> = [
   {
+    tabKeywords: ["apparel", "clothing", "fit", "piece"],
+    productMatchers: ["tee", "tank", "pant", "trouser", "hoodie", "shirt", "suit", "jacket", "anime"],
+    items: [...SAMPLE_TEES, ...SAMPLE_PANTS],
+  },
+  {
     tabKeywords: ["tee", "tank"],
     productMatchers: ["tee", "tank"],
     items: SAMPLE_TEES,
