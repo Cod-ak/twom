@@ -335,18 +335,18 @@ export default function CheckoutPage() {
 
               <div
                 data-lenis-prevent
-                className="flex flex-col gap-4 max-h-96 overflow-y-auto overscroll-contain pr-1 border-b border-zinc-100 pb-6 mb-6"
+                className="flex flex-col gap-3 max-h-96 overflow-y-auto overscroll-contain pr-1 border-b border-zinc-100 pb-6 mb-6"
               >
                 {items.map((item) => {
                   const issueReason = invalidIssues[item.id];
 
                   return (
                     <div
-                      key={`${item.id}-${item.size || "default"}`}
-                      className={`flex gap-4 items-center transition-all p-2 rounded-xs ${
+                      key={`${item.id}-${item.size || "default"}-${item.color || "default"}`}
+                      className={`shrink-0 flex gap-4 items-center transition-all p-3 rounded-3xl shadow-xs border ${
                         issueReason
-                          ? "bg-rose-50/70 border border-rose-300"
-                          : "border border-transparent"
+                          ? "bg-rose-50/70 border-rose-300"
+                          : "bg-white border-zinc-200/80"
                       }`}
                     >
                       <div className="relative w-16 h-20 bg-zinc-100 shrink-0 border border-zinc-200 overflow-hidden">
