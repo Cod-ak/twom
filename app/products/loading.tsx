@@ -1,18 +1,18 @@
 export default function ProductsLoading() {
   return (
-    <div className="w-full min-h-screen bg-twom-bg pt-[4.25rem] md:pt-[4.75rem] pb-16 md:pb-24 px-4 md:px-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="w-full min-h-screen bg-twom-bg pt-[4.25rem] pb-16 px-4">
+      <div className="w-full">
         {/* 1. Header Section */}
         <div className="flex flex-row justify-between items-end mb-4 gap-2">
           <div>
-            <span className="text-[10px] sm:text-xs uppercase tracking-[0.25em] text-twom-muted font-mono block">
+            <span className="text-[10px] uppercase tracking-[0.25em] text-twom-muted font-mono block">
               The Collection
             </span>
-            <div className="flex items-baseline gap-2.5 sm:gap-3 mt-0.5">
-              <h1 className="font-zodiak text-2xl sm:text-4xl md:text-5xl text-twom-title font-bold tracking-tight leading-none">
+            <div className="flex items-baseline gap-2.5 mt-0.5">
+              <h1 className="font-zodiak text-2xl text-twom-title font-bold tracking-tight leading-none">
                 Shop All
               </h1>
-              <span className="text-[11px] sm:text-xs uppercase tracking-wider text-twom-muted font-mono animate-pulse">
+              <span className="text-[11px] uppercase tracking-wider text-twom-muted font-mono animate-pulse">
                 (7 Pieces)
               </span>
             </div>
@@ -67,7 +67,7 @@ export default function ProductsLoading() {
         </div>
 
         {/* 3. Horizontal Category Pills Bar */}
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth pb-4 -mx-4 px-4 sm:mx-0 sm:px-0">
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth pb-4 -mx-4 px-4">
           <div className="shrink-0 px-4 py-2 rounded-full text-xs uppercase tracking-wider font-bold bg-black text-white shadow-xs">
             All
           </div>
@@ -81,31 +81,31 @@ export default function ProductsLoading() {
           ))}
         </div>
 
-        {/* 4. Products Grid: Exact 2 columns on mobile, matching TWOM card silhouettes */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 items-stretch mt-2">
+        {/* 4. Products Grid: Locked 2 columns mobile grid */}
+        <div className="grid grid-cols-2 gap-3 items-stretch mt-2">
           {[...Array(6)].map((_, i) => (
             <div
               key={i}
-              className="group relative flex flex-col justify-between w-full h-full bg-white rounded-2xl sm:rounded-[36px] border border-zinc-200/80 p-2.5 sm:p-4 shadow-xs"
+              className="group relative flex flex-col justify-between w-full h-full bg-white rounded-2xl border border-zinc-200/80 p-2.5 shadow-xs"
             >
               {/* Image Container: 1:1.28 ratio */}
-              <div className="relative aspect-[1/1.28] w-full overflow-hidden rounded-xl sm:rounded-[26px] bg-zinc-100 animate-pulse isolate">
+              <div className="relative aspect-[1/1.28] w-full overflow-hidden rounded-xl bg-zinc-100 animate-pulse isolate">
                 {/* Vertical Ribbon Badge in Top-Right Position */}
-                <span className="pointer-events-none absolute top-0 right-1.5 sm:right-2 z-10 inline-flex items-center justify-center bg-[#ffce27] border border-black/20 text-black text-[10px] sm:text-[13px] font-black tracking-[0.2em] px-1.5 sm:px-4 pt-1.5 sm:pt-3 pb-2 sm:pb-3.5 rounded-b-full rounded-t-none [writing-mode:vertical-rl] select-none uppercase shadow-xs">
+                <span className="pointer-events-none absolute top-0 right-1.5 z-10 inline-flex items-center justify-center bg-[#ffce27] border border-black/20 text-black text-[10px] font-black tracking-[0.2em] px-1.5 pt-1.5 pb-2 rounded-b-full rounded-t-none [writing-mode:vertical-rl] select-none uppercase shadow-xs">
                   NEW
                 </span>
               </div>
 
               {/* Product Title Skeleton */}
-              <div className="mt-2.5 sm:mt-3.5 mb-1 sm:mb-2 space-y-1">
-                <div className="h-3.5 sm:h-4 w-4/5 bg-zinc-200 rounded-sm animate-pulse" />
+              <div className="mt-2.5 mb-1 space-y-1">
+                <div className="h-3.5 w-4/5 bg-zinc-200 rounded-sm animate-pulse" />
               </div>
 
               {/* Bottom Action Row: Price Skeleton + Signature Yellow Cart Button */}
-              <div className="flex items-center justify-between gap-1.5 sm:gap-3 mt-auto pt-1.5 sm:pt-3">
-                <div className="h-5 sm:h-6 w-20 sm:w-28 bg-zinc-200 rounded-sm animate-pulse" />
+              <div className="flex items-center justify-between gap-1.5 mt-auto pt-1.5">
+                <div className="h-5 w-20 bg-zinc-200 rounded-sm animate-pulse" />
 
-                <div className="w-8 h-8 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-full flex items-center justify-center shrink-0 bg-[#ffce27] text-black shadow-[0_4px_14px_rgba(255,206,39,0.5)]">
+                <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 bg-[#ffce27] text-black shadow-[0_4px_14px_rgba(255,206,39,0.5)]">
                   <svg
                     width="16"
                     height="16"
@@ -115,7 +115,7 @@ export default function ProductsLoading() {
                     strokeWidth="2.2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    className="sm:w-5 sm:h-5 pointer-events-none"
+                    className="pointer-events-none"
                   >
                     <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
                     <line x1="3" y1="6" x2="21" y2="6" />

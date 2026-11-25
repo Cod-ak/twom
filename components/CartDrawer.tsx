@@ -9,8 +9,11 @@ import { formatNaira } from "@/lib/utils";
 import { useScrollLock } from "@/lib/scroll-lock";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function CartDrawer() {
+  const pathname = usePathname();
+  const isLockedMobile = !pathname?.startsWith("/admin");
   const { isCartOpen, closeCart, openCart } = useUIStore();
   const {
     items,
@@ -184,7 +187,13 @@ export default function CartDrawer() {
   };
 
   return (
-    <div className="fixed inset-0 z-120">
+    <div
+      className={
+        isLockedMobile
+          ? "fixed inset-y-0 inset-x-0 mx-auto max-w-[430px] z-120 overflow-hidden"
+          : "fixed inset-0 z-120"
+      }
+    >
       {/* Dark Blur Overlay */}
       <div
         ref={overlayRef}
@@ -200,11 +209,16 @@ export default function CartDrawer() {
       {/* Sliding Drawer Panel */}
       <aside
         ref={panelRef}
-        className="absolute top-0 right-0 h-full w-full sm:w-110 md:w-115 bg-twom-bg shadow-2xl flex flex-col z-10 font-sans"
+        data-lenis-prevent
+        className={
+          isLockedMobile
+            ? "absolute top-0 right-0 h-full w-full bg-twom-bg shadow-2xl flex flex-col z-10 font-sans"
+            : "absolute top-0 right-0 h-full w-full sm:w-110 md:w-115 bg-twom-bg shadow-2xl flex flex-col z-10 font-sans"
+        }
         aria-label="Shopping Cart Drawer"
       >
         {/* Drawer Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-twom-border/50 bg-twom-bg">
+        <div className="shrink-0 flex items-center justify-between px-6 py-5 border-b border-twom-border/50 bg-twom-bg">
           <div className="flex items-center gap-2">
             <h2 className="font-zodiak text-2xl font-bold text-twom-title">
               Your Bag
@@ -240,9 +254,9 @@ export default function CartDrawer() {
         </div>
 
         {/* Cart Items List */}
-        <div className="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-3">
+        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-5 py-4 flex flex-col gap-3">
           {items.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-center py-20 px-4">
+            <div className="min-h-full flex flex-col items-center justify-center text-center py-20 px-4">
               <div className="w-20 h-20 rounded-3xl bg-white shadow-xs border border-zinc-200/60 flex items-center justify-center text-zinc-400 mb-5">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -274,7 +288,7 @@ export default function CartDrawer() {
               </Link>
             </div>
           ) : (
-            <div className="bg-white rounded-3xl p-3 sm:p-4 shadow-xs border border-zinc-200/60 flex flex-col divide-y divide-zinc-100">
+            <div className="shrink-0 bg-white rounded-3xl p-3 sm:p-4 shadow-xs border border-zinc-200/60 flex flex-col divide-y divide-zinc-100">
               {items.map((item) => {
                 const isLogoPlaceholder =
                   !item.image_url ||
@@ -385,7 +399,7 @@ export default function CartDrawer() {
 
         {/* Drawer Footer & Checkout Controls */}
         {items.length > 0 && (
-          <div className="px-6 py-5 border-t border-twom-border/50 bg-twom-bg flex flex-col gap-4">
+          <div className="shrink-0 max-h-[52dvh] overflow-y-auto overscroll-contain px-6 py-5 border-t border-twom-border/50 bg-twom-bg flex flex-col gap-4">
             {/* Promo / Discount Code Pill */}
             <div className="rounded-2xl bg-white border border-zinc-200/80 p-3 shadow-2xs transition">
               <button

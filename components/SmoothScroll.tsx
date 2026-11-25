@@ -16,6 +16,7 @@ export default function SmoothScroll() {
       smoothWheel: true,
       wheelMultiplier: 1,
       touchMultiplier: 1.5,
+      allowNestedScroll: true,
     });
 
     (window as unknown as { __lenis?: Lenis }).__lenis = lenis;

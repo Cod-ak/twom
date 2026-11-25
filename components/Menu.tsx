@@ -2,6 +2,7 @@
 import { useState, useRef, useCallback, useEffect, useSyncExternalStore } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { useCartStore } from "@/lib/store";
@@ -49,6 +50,8 @@ const OPEN_BULGE = `M${SVG_W},345 Q${SVG_CX},620 0,345 L0,0 L${SVG_W},0 Z`;
 const OPEN_FULL = `M${SVG_W},${SVG_H} Q${SVG_CX},${SVG_H} 0,${SVG_H} L0,0 L${SVG_W},0 Z`;
 
 export default function Menu() {
+  const pathname = usePathname();
+  const isLockedMobile = !pathname?.startsWith("/admin");
   const [isOpen, setIsOpen] = useState(false);
   const [isNavHidden, setIsNavHidden] = useState(false);
   // Hydration safety: useSyncExternalStore returns false on server, true on client
@@ -340,7 +343,7 @@ export default function Menu() {
   }, []);
 
   return (
-    <div className={styles.nav}>
+    <div className={`${styles.nav}${isLockedMobile ? ` ${styles.navLocked}` : ""}`}>
       <header
         className={`${styles["nav-header"]}${
           isNavHidden && !isOpen ? ` ${styles["nav-header-hidden"]}` : ""
@@ -433,6 +436,7 @@ export default function Menu() {
 
       <div
         ref={menuRef}
+        data-lenis-prevent
         className={`${styles.menu}${isOpen ? ` ${styles["is-open"]}` : ""}`}
       >
         <svg
@@ -441,7 +445,7 @@ export default function Menu() {
           preserveAspectRatio="none"
           xmlns="http://www.w3.org/2000/svg"
         >
-          <path ref={menuBgRef} id="menu-path" fill="#f0eeee" d={OPEN_HIDDEN} />
+          <path ref={menuBgRef} id="menu-path" fill="#ffce27" d={OPEN_HIDDEN} />
         </svg>
 
         <div className={`${styles["menu-col"]} ${styles["menu-col-info"]}`}>

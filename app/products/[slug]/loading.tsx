@@ -1,9 +1,9 @@
 export default function ProductDetailLoading() {
   return (
-    <div className="w-full min-h-screen bg-twom-bg pt-[4.25rem] md:pt-[4.75rem] pb-24 px-4 md:px-8 animate-pulse">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-8 lg:gap-14">
-        {/* Left Column: Product Image Gallery */}
-        <div className="w-full md:w-1/2 flex flex-col gap-4">
+    <div className="w-full min-h-screen bg-twom-bg pt-[4.25rem] pb-16 px-4 animate-pulse">
+      <div className="w-full flex flex-col gap-5">
+        {/* Top: Product Image Gallery */}
+        <div className="w-full flex flex-col gap-4">
           <div className="aspect-[1/1.28] w-full bg-zinc-100 rounded-2xl border border-zinc-200/80 shadow-xs" />
           <div className="flex gap-2 justify-center">
             <div className="w-2 h-2 rounded-full bg-zinc-300" />
@@ -12,11 +12,11 @@ export default function ProductDetailLoading() {
           </div>
         </div>
 
-        {/* Right Column: Atelier Details & Purchase Actions */}
-        <div className="w-full md:w-1/2 flex flex-col gap-6 pt-2">
+        {/* Bottom: Atelier Details & Purchase Actions */}
+        <div className="w-full flex flex-col gap-6 pt-2">
           <div className="space-y-2">
             <div className="h-3 w-24 bg-zinc-200/80 rounded-full" />
-            <div className="h-8 sm:h-10 w-4/5 bg-zinc-200 rounded-md" />
+            <div className="h-8 w-4/5 bg-zinc-200 rounded-md" />
             <div className="h-7 w-32 bg-zinc-200 rounded-md mt-2" />
           </div>
 

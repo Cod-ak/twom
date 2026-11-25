@@ -33,8 +33,8 @@ export default async function ProductsPage({
     products && products.length > 0 ? products : SHOWCASE_SAMPLES;
 
   return (
-    <div className="w-full min-h-screen bg-twom-bg pt-[4.25rem] md:pt-[4.75rem] pb-16 md:pb-24 px-4 md:px-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="w-full min-h-screen bg-twom-bg pt-[4.25rem] pb-16 px-4">
+      <div className="w-full">
         <ProductCatalogView
           initialProducts={allProducts}
           initialCategory={category}

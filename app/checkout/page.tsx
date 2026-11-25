@@ -113,8 +113,8 @@ export default function CheckoutPage() {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-twom-bg pt-36 pb-24 px-6 flex flex-col items-center justify-center text-center">
-        <h1 className="font-zodiak text-3xl md:text-4xl text-twom-title mb-4">
+      <div className="min-h-screen bg-twom-bg pt-36 pb-24 px-5 flex flex-col items-center justify-center text-center">
+        <h1 className="font-zodiak text-3xl text-twom-title mb-4">
           Your Shopping Bag is Empty
         </h1>
         <p className="text-twom-muted text-sm mb-8 max-w-md">
@@ -200,9 +200,9 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="min-h-screen bg-twom-bg pt-[4.25rem] md:pt-[4.75rem] pb-16 md:pb-24 px-4 md:px-6">
-      <div className="max-w-5xl mx-auto">
-        <div className="mb-10 pb-6 border-b border-zinc-200">
+    <div className="min-h-screen bg-twom-bg pt-[4.25rem] pb-16 px-4">
+      <div className="w-full">
+        <div className="mb-8 pb-5 border-b border-zinc-200">
           <button
             type="button"
             onClick={() => openCart()}
@@ -210,28 +210,28 @@ export default function CheckoutPage() {
           >
             ← Back to Bag
           </button>
-          <h1 className="font-zodiak text-4xl text-twom-title mt-2">
+          <h1 className="font-zodiak text-3xl text-twom-title mt-2">
             Secure Checkout
           </h1>
         </div>
 
         {errorMessage && (
-          <div className="mb-8 p-4 bg-rose-50 border border-rose-200 text-rose-800 text-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="mb-6 p-4 bg-rose-50 border border-rose-200 text-rose-800 text-sm flex flex-col gap-3">
             <div>
               <p className="font-medium">Order Update Required</p>
               <p className="text-xs mt-1 text-rose-600">{errorMessage}</p>
             </div>
             {hasInvalidItems && (
-              <span className="text-[11px] uppercase tracking-wider font-mono text-rose-700 bg-rose-100 px-2.5 py-1 rounded-xs shrink-0 self-start sm:self-center">
+              <span className="text-[11px] uppercase tracking-wider font-mono text-rose-700 bg-rose-100 px-2.5 py-1 rounded-xs shrink-0 self-start">
                 Action required in Order Summary →
               </span>
             )}
           </div>
         )}
 
-        <div className="flex flex-col lg:flex-row gap-12">
-          {/* Left: Customer Form */}
-          <div className="w-full lg:w-7/12">
+        <div className="flex flex-col gap-8">
+          {/* Customer Form */}
+          <div className="w-full">
             <h2 className="font-mono text-xs uppercase tracking-widest text-twom-muted mb-6">
               1. Delivery & Contact Details
             </h2>
@@ -319,9 +319,9 @@ export default function CheckoutPage() {
             </form>
           </div>
 
-          {/* Right: Order Summary with In-Place Resolution */}
-          <div className="w-full lg:w-5/12">
-            <div className="bg-white border border-zinc-200 p-6 md:p-8 sticky top-32">
+          {/* Order Summary with In-Place Resolution */}
+          <div className="w-full">
+            <div className="bg-white border border-zinc-200 p-5">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="font-mono text-xs uppercase tracking-widest text-twom-muted">
                   2. Order Summary ({items.length} {items.length === 1 ? "Piece" : "Pieces"})
@@ -333,7 +333,10 @@ export default function CheckoutPage() {
                 )}
               </div>
 
-              <div className="flex flex-col gap-4 max-h-96 overflow-y-auto pr-1 border-b border-zinc-100 pb-6 mb-6">
+              <div
+                data-lenis-prevent
+                className="flex flex-col gap-4 max-h-96 overflow-y-auto overscroll-contain pr-1 border-b border-zinc-100 pb-6 mb-6"
+              >
                 {items.map((item) => {
                   const issueReason = invalidIssues[item.id];
 

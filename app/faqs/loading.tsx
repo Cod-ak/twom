@@ -1,10 +1,10 @@
 export default function FAQLoading() {
   return (
-    <div className="w-full min-h-screen bg-twom-bg pt-[4.25rem] md:pt-[4.75rem] pb-24 px-4 md:px-6 animate-pulse">
-      <div className="max-w-4xl mx-auto space-y-6">
+    <div className="w-full min-h-screen bg-twom-bg pt-[4.25rem] pb-16 px-4 animate-pulse">
+      <div className="w-full space-y-6">
         <div className="space-y-2 mb-8">
           <div className="h-3 w-28 bg-zinc-200/80 rounded-full font-mono" />
-          <div className="h-10 sm:h-12 w-64 bg-zinc-200 rounded-md" />
+          <div className="h-10 w-64 bg-zinc-200 rounded-md" />
         </div>
 
         <div className="space-y-3">

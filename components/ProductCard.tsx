@@ -57,9 +57,9 @@ export default function ProductCard({ product, isNew }: ProductCardProps) {
   const productHref = `/products/${product.slug || product.id}`;
 
   return (
-    <div className="group relative flex flex-col justify-between w-full h-full bg-white rounded-2xl sm:rounded-[36px] border-2 sm:border-[3.5px] border-black p-2.5 sm:p-4 shadow-md hover:shadow-xl transition-all duration-300">
-      {/* Image container: reduced height by 20% from 1:1.6 -> 1:1.28 */}
-      <div className="relative aspect-[1/1.28] w-full overflow-hidden rounded-xl sm:rounded-[26px] bg-zinc-100 isolate">
+    <div className="group relative flex flex-col justify-between w-full h-full bg-white rounded-2xl border-2 border-black p-2.5 shadow-md hover:shadow-xl transition-all duration-300">
+      {/* Image container: 1:1.28 mobile editorial ratio */}
+      <div className="relative aspect-[1/1.28] w-full overflow-hidden rounded-xl bg-zinc-100 isolate">
         <Link
           href={productHref}
           className="relative block w-full h-full cursor-pointer"
@@ -69,7 +69,7 @@ export default function ProductCard({ product, isNew }: ProductCardProps) {
               src={product.image_url}
               alt={product.name}
               fill
-              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              sizes="220px"
               className={`object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out ${
                 isOutOfStock ? "opacity-60 grayscale-30" : ""
               }`}
@@ -83,11 +83,11 @@ export default function ProductCard({ product, isNew }: ProductCardProps) {
 
         {/* Vertical Ribbon Badge in Top-Right Position: SOLD OUT overrides NEW */}
         {isOutOfStock ? (
-          <span className="pointer-events-none absolute top-0 right-1.5 sm:right-2 z-10 inline-flex items-center justify-center bg-[#222222] backdrop-blur-md border border-white/15 text-white text-[9px] sm:text-[11px] font-black tracking-[0.2em] px-1 sm:px-3 pt-1.5 sm:pt-3 pb-2.5 sm:pb-3.5 rounded-b-full rounded-t-none [writing-mode:vertical-rl] select-none uppercase shadow-sm">
+          <span className="pointer-events-none absolute top-0 right-1.5 z-10 inline-flex items-center justify-center bg-[#222222] backdrop-blur-md border border-white/15 text-white text-[9px] font-black tracking-[0.2em] px-1 pt-1.5 pb-2.5 rounded-b-full rounded-t-none [writing-mode:vertical-rl] select-none uppercase shadow-sm">
             SOLD OUT
           </span>
         ) : isItemNew ? (
-          <span className="pointer-events-none absolute top-0 right-1.5 sm:right-2 z-10 inline-flex items-center justify-center bg-[#ffce27] backdrop-blur-md border border-black/20 text-black text-[10px] sm:text-[13px] font-black tracking-[0.2em] px-1.5 sm:px-4 pt-1.5 sm:pt-3 pb-2 sm:pb-3.5 rounded-b-full rounded-t-none [writing-mode:vertical-rl] select-none uppercase shadow-xs">
+          <span className="pointer-events-none absolute top-0 right-1.5 z-10 inline-flex items-center justify-center bg-[#ffce27] backdrop-blur-md border border-black/20 text-black text-[10px] font-black tracking-[0.2em] px-1.5 pt-1.5 pb-2 rounded-b-full rounded-t-none [writing-mode:vertical-rl] select-none uppercase shadow-xs">
             NEW
           </span>
         ) : null}
@@ -96,21 +96,21 @@ export default function ProductCard({ product, isNew }: ProductCardProps) {
       {/* Product Title */}
       <Link
         href={productHref}
-        className="hover:opacity-75 transition-opacity block mt-2 sm:mt-3.5 mb-1 sm:mb-2"
+        className="hover:opacity-75 transition-opacity block mt-2 mb-1"
       >
-        <h3 className="text-xs sm:text-lg md:text-xl font-bold text-black leading-snug line-clamp-1 tracking-tight">
+        <h3 className="text-xs font-bold text-black leading-snug line-clamp-1 tracking-tight">
           {product.name}
         </h3>
       </Link>
 
       {/* Bottom Action Row: Bold Price (Left) + Signature Yellow Cart Button (Right) */}
-      <div className="flex items-center justify-between gap-1.5 sm:gap-3 mt-auto pt-1.5 sm:pt-3">
+      <div className="flex items-center justify-between gap-1.5 mt-auto pt-1.5">
         <div className="flex flex-col min-w-0">
-          <span className="text-sm sm:text-xl md:text-2xl font-black text-black tracking-tight leading-none truncate">
+          <span className="text-sm font-black text-black tracking-tight leading-none truncate">
             {formatNaira(product.price)}
           </span>
           {product.originalPrice && product.originalPrice > product.price ? (
-            <span className="text-zinc-400 line-through text-[10px] sm:text-xs font-semibold mt-0.5 sm:mt-1 truncate">
+            <span className="text-zinc-400 line-through text-[10px] font-semibold mt-0.5 truncate">
               {formatNaira(product.originalPrice)}
             </span>
           ) : null}
@@ -125,10 +125,10 @@ export default function ProductCard({ product, isNew }: ProductCardProps) {
               ? `${product.name} is sold out`
               : `Quick buy ${product.name}`
           }
-          className={`w-8 h-8 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-full flex items-center justify-center shrink-0 transition-all touch-manipulation cursor-pointer ${
+          className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all touch-manipulation cursor-pointer ${
             isOutOfStock
               ? "bg-zinc-200 text-zinc-400 cursor-not-allowed"
-              : "bg-[#ffce27] text-black shadow-[0_4px_14px_rgba(255,206,39,0.5)] sm:shadow-[0_8px_20px_rgba(255,206,39,0.7)] hover:scale-105 active:scale-95"
+              : "bg-[#ffce27] text-black shadow-[0_4px_14px_rgba(255,206,39,0.5)] hover:scale-105 active:scale-95"
           }`}
         >
           <svg
@@ -140,7 +140,7 @@ export default function ProductCard({ product, isNew }: ProductCardProps) {
             strokeWidth="2.2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="sm:w-5 sm:h-5 pointer-events-none"
+            className="pointer-events-none"
           >
             <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
             <line x1="3" y1="6" x2="21" y2="6" />

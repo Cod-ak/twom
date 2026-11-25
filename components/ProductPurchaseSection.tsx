@@ -126,17 +126,17 @@ export default function ProductPurchaseSection({
       </div>
 
       {/* 3. Product Title */}
-      <h1 className="font-zodiak text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-twom-title font-bold leading-tight tracking-tight mb-3">
+      <h1 className="font-zodiak text-2xl text-twom-title font-bold leading-tight tracking-tight mb-3">
         {product.name}
       </h1>
 
       {/* 4. Price & Discount Badges */}
       <div className="flex items-baseline gap-3 mb-3">
-        <span className="text-2xl sm:text-3xl font-black text-twom-title tracking-tight">
+        <span className="text-2xl font-black text-twom-title tracking-tight">
           {formatNaira(product.price)}
         </span>
         {product.originalPrice && product.originalPrice > product.price && (
-          <span className="text-base sm:text-lg text-zinc-400 line-through font-medium">
+          <span className="text-base text-zinc-400 line-through font-medium">
             {formatNaira(product.originalPrice)}
           </span>
         )}

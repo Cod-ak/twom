@@ -92,14 +92,14 @@ export default function ProductCatalogView({
       {/* 1. Header Section */}
       <div className="flex flex-row justify-between items-end mb-4 gap-2">
         <div>
-          <span className="text-[10px] sm:text-xs uppercase tracking-[0.25em] text-twom-muted font-mono block">
+          <span className="text-[10px] uppercase tracking-[0.25em] text-twom-muted font-mono block">
             The Collection
           </span>
-          <div className="flex items-baseline gap-2.5 sm:gap-3 mt-0.5">
-            <h1 className="font-zodiak text-2xl sm:text-4xl md:text-5xl text-twom-title font-bold capitalize tracking-tight leading-none">
+          <div className="flex items-baseline gap-2.5 mt-0.5">
+            <h1 className="font-zodiak text-2xl text-twom-title font-bold capitalize tracking-tight leading-none">
               {selectedCategory === "all" ? "Shop All" : selectedCategory}
             </h1>
-            <span className="text-[11px] sm:text-xs uppercase tracking-wider text-twom-muted font-mono">
+            <span className="text-[11px] uppercase tracking-wider text-twom-muted font-mono">
               ({filteredProducts.length}{" "}
               {filteredProducts.length === 1 ? "Piece" : "Pieces"})
             </span>
@@ -110,7 +110,7 @@ export default function ProductCatalogView({
           <button
             type="button"
             onClick={() => handleSelectCategory("all")}
-            className="text-[11px] sm:text-xs uppercase tracking-wider text-black font-bold underline underline-offset-4 hover:opacity-70 transition-opacity cursor-pointer shrink-0 pb-0.5"
+            className="text-[11px] uppercase tracking-wider text-black font-bold underline underline-offset-4 hover:opacity-70 transition-opacity cursor-pointer shrink-0 pb-0.5"
           >
             Reset ✕
           </button>
@@ -222,8 +222,8 @@ export default function ProductCatalogView({
         </div>
       </div>
 
-      {/* 3. Horizontal Category Pills Bar (Matching Screenshot 1) */}
-      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth pb-4 -mx-4 px-4 sm:mx-0 sm:px-0">
+      {/* 3. Horizontal Category Pills Bar */}
+      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth pb-4 -mx-4 px-4">
         {categories.map((cat) => {
           const isActive =
             selectedCategory.toLowerCase() === cat.toLowerCase();
@@ -246,9 +246,9 @@ export default function ProductCatalogView({
         })}
       </div>
 
-      {/* 4. Products Grid: 2 columns on mobile, 3 on tablet, 4 on desktop */}
+      {/* 4. Products Grid: Locked to 2 columns mobile layout */}
       {filteredProducts.length > 0 ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 items-stretch mt-2">
+        <div className="grid grid-cols-2 gap-3 items-stretch mt-2">
           {filteredProducts.map((product: ShowcaseItem) => (
             <ProductCard key={product.id} product={product} />
           ))}

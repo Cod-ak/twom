@@ -4,8 +4,8 @@ export const instant = false;
 
 export default function AccountPage() {
   return (
-    <div className="w-full min-h-screen bg-twom-bg pt-[4.25rem] md:pt-[4.75rem] pb-16 md:pb-24 px-4 md:px-6 text-twom-body font-sans flex items-center justify-center">
-      <div className="max-w-md w-full bg-white p-8 md:p-10 border border-zinc-200 shadow-sm text-center">
+    <div className="w-full min-h-screen bg-twom-bg pt-[4.25rem] pb-16 px-4 text-twom-body font-sans flex items-center justify-center">
+      <div className="w-full bg-white p-6 border border-zinc-200 shadow-sm text-center">
         <span className="text-[10px] uppercase tracking-[0.25em] font-mono text-zinc-400 block mb-2">
           Client Services
         </span>

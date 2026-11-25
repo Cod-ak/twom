@@ -96,10 +96,10 @@ export default async function ProductPage({
   const isSample = isSampleProductId(product.id);
 
   return (
-    <div className="w-full min-h-screen bg-twom-bg pt-[4.25rem] md:pt-[4.75rem] pb-16 md:pb-24 px-4 md:px-6">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-4 md:gap-6 items-start">
-        {/* Left Column: Swipeable Product Image Gallery */}
-        <div className="w-full md:w-1/2">
+    <div className="w-full min-h-screen bg-twom-bg pt-[4.25rem] pb-16 px-4">
+      <div className="w-full flex flex-col gap-5 items-start">
+        {/* Top: Swipeable Product Image Gallery */}
+        <div className="w-full">
           <ProductImageGallery
             images={
               product.images && product.images.length > 0
@@ -110,8 +110,8 @@ export default async function ProductPage({
           />
         </div>
 
-        {/* Right Column: Details & Purchase UI (Arranged like reference) */}
-        <div className="w-full md:w-1/2">
+        {/* Bottom: Details & Purchase UI */}
+        <div className="w-full">
           <ProductPurchaseSection product={product} isSample={isSample} />
         </div>
       </div>

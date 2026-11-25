@@ -3,15 +3,15 @@ import NewsletterForm from "./NewsletterForm";
 
 export default function Footer() {
   return (
-    <footer className="bg-twom-bg border-t border-twom-border text-twom-body pt-16 pb-12 font-sans">
-      <div className="max-w-7xl mx-auto px-6">
+    <footer className="bg-twom-bg border-t border-twom-border text-twom-body pt-12 pb-10 font-sans mt-auto">
+      <div className="w-full px-5">
         {/* Top Row: Newsletter & Brand Message */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 pb-16 border-b border-twom-border/40">
+        <div className="grid grid-cols-1 gap-8 pb-10 border-b border-twom-border/40">
           <div>
-            <h3 className="font-zodiak text-2xl text-twom-title mb-3">
+            <h3 className="font-zodiak text-2xl text-twom-title mb-2">
               The TWOM Newsletter
             </h3>
-            <p className="text-sm tracking-wide text-twom-muted max-w-md">
+            <p className="text-xs tracking-wide text-twom-muted leading-relaxed">
               Receive private invitations to seasonal collection releases,
               editorial stories, and atelier updates.
             </p>
@@ -20,8 +20,8 @@ export default function Footer() {
           <NewsletterForm />
         </div>
 
-        {/* Middle Row: Navigation Link Columns */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-10 py-16 border-b border-twom-border/40 text-sm">
+        {/* Middle Row: Navigation Link Columns (Mobile 2x2 Stack) */}
+        <div className="grid grid-cols-2 gap-8 py-10 border-b border-twom-border/40 text-xs">
           {/* Column 1: Collection */}
           <div className="flex flex-col space-y-4">
             <span className="text-xs uppercase tracking-[0.2em] text-twom-title font-semibold">
@@ -130,11 +130,11 @@ export default function Footer() {
         </div>
 
         {/* Bottom Row: Copyright & Legal */}
-        <div className="pt-8 flex flex-col md:flex-row items-center justify-between text-xs tracking-wider text-twom-muted space-y-4 md:space-y-0">
+        <div className="pt-8 flex flex-col items-center justify-between text-xs tracking-wider text-twom-muted space-y-4 text-center">
           <div>
             &copy; 2026 TWOM Studios. All rights reserved.
           </div>
-          <div className="flex space-x-6">
+          <div className="flex flex-wrap justify-center gap-5">
             <Link
               href="/privacy"
               className="hover:text-twom-title transition-colors"

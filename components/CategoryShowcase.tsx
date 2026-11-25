@@ -64,7 +64,7 @@ export default function CategoryShowcase({
     effectiveActiveTab === tabs[0] ? apparelItems : accessoriesItems;
 
   return (
-    <section className="w-full max-w-7xl mx-auto px-4 md:px-6 pt-6 pb-4">
+    <section className="w-full px-4 pt-6 pb-4">
       {/* Liquid Glass Category Switcher Dock */}
       <div className="flex items-center mb-6">
         <GlassSurface
@@ -83,7 +83,7 @@ export default function CategoryShowcase({
           refraction
           renderer="auto"
           className="shadow-[0_8px_30px_rgba(0,0,0,0.08)]"
-          contentClassName="relative z-1 inline-flex items-center p-1.5 rounded-full gap-1 sm:gap-2"
+          contentClassName="relative z-1 inline-flex items-center p-1.5 rounded-full gap-1"
         >
           {tabs.map((tab, idx) => {
             const hasItems =
@@ -99,7 +99,7 @@ export default function CategoryShowcase({
                 onClick={() => {
                   if (hasItems) setSelectedTab(tab);
                 }}
-                className={`relative px-4 sm:px-6 py-2 sm:py-2.5 rounded-full font-nippo italic uppercase text-xs sm:text-sm md:text-base tracking-wider transition-all duration-300 ${
+                className={`relative px-4 py-2 rounded-full font-nippo italic uppercase text-xs tracking-wider transition-all duration-300 ${
                   !hasItems
                     ? "text-zinc-400 opacity-35 cursor-not-allowed pointer-events-none font-bold"
                     : isActive
@@ -114,12 +114,12 @@ export default function CategoryShowcase({
         </GlassSurface>
       </div>
 
-      {/* Horizontal Scrollable Product Carousel */}
-      <div className="flex items-stretch gap-4 md:gap-6 overflow-x-auto no-scrollbar snap-x snap-mandatory scroll-px-4 md:scroll-px-0 -mx-4 px-4 md:mx-0 md:px-0 pb-2">
+      {/* Horizontal Scrollable Product Carousel (Mobile Locked) */}
+      <div className="flex items-stretch gap-4 overflow-x-auto no-scrollbar snap-x snap-mandatory scroll-px-4 -mx-4 px-4 pb-2">
         {displayedItems.map((item) => (
           <div
             key={item.id}
-            className="w-[76vw] min-w-[76vw] sm:w-[46vw] sm:min-w-[46vw] md:w-[calc(25%-18px)] md:min-w-[calc(25%-18px)] shrink-0 snap-start flex flex-col h-full"
+            className="w-[76%] min-w-[76%] shrink-0 snap-start flex flex-col h-full"
           >
             <ProductCard product={item} />
           </div>

@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef, useSyncExternalStore } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { useUIStore } from "@/lib/ui-store";
@@ -13,6 +14,8 @@ import { useScrollLock } from "@/lib/scroll-lock";
 const SIZES = ["XS", "S", "M", "L", "XL", "XXL"] as const;
 
 export default function QuickBuySheet() {
+  const pathname = usePathname();
+  const isLockedMobile = !pathname?.startsWith("/admin");
   const { isQuickBuyOpen, quickBuyProduct, closeQuickBuy, openCart } =
     useUIStore();
   const addItem = useCartStore((state) => state.addItem);
@@ -114,23 +117,34 @@ export default function QuickBuySheet() {
   const dynamicSku = `${quickBuyProduct.sku || "TWOM"}-${selectedSize}`;
 
   return (
-    <div className="fixed inset-0 z-110 flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div
+      className={
+        isLockedMobile
+          ? "fixed inset-y-0 inset-x-0 mx-auto max-w-[430px] z-110 flex items-end justify-center p-0 overflow-hidden"
+          : "fixed inset-0 z-110 flex items-end sm:items-center justify-center p-0 sm:p-4"
+      }
+    >
       {/* Blurred Dark Backdrop */}
       <div
         ref={overlayRef}
         onClick={closeQuickBuy}
         onTouchEnd={(e) => { e.preventDefault(); closeQuickBuy(); }}
-        className="fixed inset-0 bg-black/60 opacity-0 backdrop-blur-xs transition-opacity cursor-pointer pointer-events-none"
+        className="absolute inset-0 bg-black/60 opacity-0 backdrop-blur-xs transition-opacity cursor-pointer pointer-events-none"
         aria-hidden="true"
       />
 
       {/* Slide-Up Bottom Sheet Panel */}
       <div
         ref={sheetRef}
+        data-lenis-prevent
         role="dialog"
         aria-modal="true"
         aria-label={`Quick add ${quickBuyProduct.name}`}
-        className="relative z-10 w-full sm:max-w-lg bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl p-6 md:p-8 flex flex-col gap-6 max-h-[90vh] overflow-y-auto no-scrollbar"
+        className={
+          isLockedMobile
+            ? "relative z-10 w-full bg-white rounded-t-2xl shadow-2xl p-6 flex flex-col gap-5 max-h-[90vh] overflow-y-auto overscroll-contain no-scrollbar"
+            : "relative z-10 w-full sm:max-w-lg bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl p-6 md:p-8 flex flex-col gap-6 max-h-[90vh] overflow-y-auto overscroll-contain no-scrollbar"
+        }
       >
         {/* Top Product Summary Row */}
         <div className="flex gap-4 items-start justify-between">

@@ -104,8 +104,9 @@
   position: absolute;
   top: 0.15rem;
   right: 0.15rem;
-  background-color: #111111;
-  color: #ffffff;
+  background-color: #ffce27;
+  color: #111111;
+  border: 1px solid rgba(17, 17, 17, 0.28);
   font-family: var(--font-nippo, sans-serif);
   font-size: 0.625rem;
   font-weight: 700;
@@ -257,7 +258,7 @@
 
   .menu-col-info {
     padding-top: 1.5rem;
-    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    border-top: 1px solid rgba(0, 0, 0, 0.14);
   }
 
   .menu-col-info h3 {
@@ -287,4 +288,68 @@
   .menu-col a {
     font-size: clamp(1.25rem, 6vw, 1.6rem);
   }
+}
+
+/* Storefront Mobile-View Lock (pins navbar & GSAP menu inside 430px shell on all viewports) */
+.navLocked,
+.navLocked .nav-header,
+.navLocked .menu,
+.navLocked .menu-bg-svg {
+  left: 0;
+  right: 0;
+  margin-inline: auto;
+  width: 100%;
+  max-width: 430px;
+}
+
+.navLocked .nav-toggle {
+  left: 1rem;
+}
+
+.navLocked .nav-cart {
+  right: 1rem;
+}
+
+.navLocked .menu {
+  flex-direction: column-reverse;
+  justify-content: flex-start;
+  padding: 5.25rem 1.5rem 3.5rem;
+  gap: 2rem;
+}
+
+.navLocked .menu-col {
+  flex: none;
+  justify-content: flex-start;
+}
+
+.navLocked .menu-col-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.navLocked .menu-col a {
+  font-size: 1.5rem;
+  line-height: 1.2;
+}
+
+.navLocked .menu-col-info {
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.14);
+}
+
+.navLocked .menu-col-info h3 {
+  font-size: 1.15rem;
+  letter-spacing: -0.02em;
+}
+
+.navLocked .menu-col-info h6 {
+  font-size: 0.9rem;
+  letter-spacing: 0;
+}
+
+.navLocked .menu-col p {
+  font-size: 0.65rem;
+  letter-spacing: 0.2rem;
+  margin-bottom: 0.5rem;
 }

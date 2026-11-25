@@ -15,17 +15,17 @@ export const metadata: Metadata = {
 
 export default function ConciergePage() {
   return (
-    <div className="w-full min-h-screen bg-twom-bg pt-[4.25rem] md:pt-[4.75rem] pb-16 md:pb-24 px-4 md:px-6 text-twom-body font-sans">
-      <div className="max-w-4xl mx-auto space-y-12">
+    <div className="w-full min-h-screen bg-twom-bg pt-[4.25rem] pb-16 px-4 text-twom-body font-sans">
+      <div className="w-full space-y-10">
         {/* Header */}
         <div>
           <span className="text-xs uppercase tracking-[0.25em] text-twom-muted font-mono block mb-3">
             Client Services &bull; Advisory
           </span>
-          <h1 className="font-zodiak text-4xl sm:text-6xl text-twom-title leading-tight mb-4">
+          <h1 className="font-zodiak text-4xl text-twom-title leading-tight mb-4">
             Private Concierge
           </h1>
-          <p className="text-sm md:text-base text-twom-muted max-w-2xl leading-relaxed">
+          <p className="text-sm text-twom-muted leading-relaxed">
             Our atelier specialists are available to provide individualized
             sizing recommendations, styling guidance, and priority assistance
             with order fulfillment.
@@ -33,15 +33,15 @@ export default function ConciergePage() {
         </div>
 
         {/* Channels Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white p-7 sm:p-8 border border-zinc-200/90 rounded-2xl shadow-xs space-y-3">
+        <div className="grid grid-cols-1 gap-6">
+          <div className="bg-white p-6 border border-zinc-200/90 rounded-2xl shadow-xs space-y-3">
             <span className="text-[10px] uppercase font-mono tracking-widest text-zinc-400 block">
               Digital Correspondence
             </span>
             <h2 className="font-zodiak text-2xl text-twom-title">
               Email Advisory
             </h2>
-            <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed">
+            <p className="text-xs text-zinc-600 leading-relaxed">
               For general inquiries, order status confirmations, and styling
               consultations. We respond within 12 hours.
             </p>
@@ -55,14 +55,14 @@ export default function ConciergePage() {
             </div>
           </div>
 
-          <div className="bg-white p-7 sm:p-8 border border-zinc-200/90 rounded-2xl shadow-xs space-y-3">
+          <div className="bg-white p-6 border border-zinc-200/90 rounded-2xl shadow-xs space-y-3">
             <span className="text-[10px] uppercase font-mono tracking-widest text-zinc-400 block">
               Immediate Assistance
             </span>
             <h2 className="font-zodiak text-2xl text-twom-title">
               WhatsApp Concierge
             </h2>
-            <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed">
+            <p className="text-xs text-zinc-600 leading-relaxed">
               Direct text liaison with our Lagos studio team for immediate dispatch
               updates, address adjustments, and quick fit checks.
             </p>
@@ -80,21 +80,21 @@ export default function ConciergePage() {
         </div>
 
         {/* Operating Hours */}
-        <div className="p-8 bg-white border border-zinc-200/90 rounded-2xl shadow-xs space-y-3">
+        <div className="p-6 bg-white border border-zinc-200/90 rounded-2xl shadow-xs space-y-3">
           <span className="text-[10px] uppercase tracking-widest font-mono text-zinc-400 block">
             Studio Hours
           </span>
           <h2 className="font-zodiak text-2xl text-twom-title">
             Hours of Operation
           </h2>
-          <p className="text-xs sm:text-sm text-twom-muted leading-relaxed">
+          <p className="text-xs text-twom-muted leading-relaxed">
             Monday through Saturday: 9:00 AM – 7:00 PM WAT.<br />
             Sundays & Public Holidays: Priority dispatch assistance only.
           </p>
         </div>
 
         {/* CTA */}
-        <div className="pt-4 flex items-center justify-between border-t border-zinc-200/80">
+        <div className="pt-4 flex flex-col items-stretch gap-4 border-t border-zinc-200/80">
           <Link
             href="/shipping"
             className="text-xs uppercase tracking-wider font-mono text-zinc-600 hover:text-black transition-colors"
@@ -104,7 +104,7 @@ export default function ConciergePage() {
 
           <Link
             href="/products"
-            className="liquid-glass-pill rounded-full text-black font-bold px-8 py-3.5 text-xs uppercase tracking-[0.2em] font-nippo hover:scale-[1.02] active:scale-[0.98] transition-all text-center"
+            className="w-full liquid-glass-pill rounded-full text-black font-bold px-8 py-3.5 text-xs uppercase tracking-[0.2em] font-nippo hover:scale-[1.02] active:scale-[0.98] transition-all text-center"
           >
             Explore Collection →
           </Link>

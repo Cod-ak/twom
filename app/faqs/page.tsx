@@ -48,17 +48,17 @@ const FAQS = [
 
 export default function FAQPage() {
   return (
-    <div className="w-full min-h-screen bg-twom-bg pt-17 md:pt-19 pb-16 md:pb-24 px-4 md:px-6 text-twom-body font-sans">
-      <div className="max-w-4xl mx-auto space-y-12">
+    <div className="w-full min-h-screen bg-twom-bg pt-17 pb-16 px-4 text-twom-body font-sans">
+      <div className="w-full space-y-10">
         {/* Header */}
         <div>
           <span className="text-xs uppercase tracking-[0.25em] text-twom-muted font-mono block mb-3">
             Client Services &bull; Inquiries
           </span>
-          <h1 className="font-zodiak text-4xl sm:text-6xl text-twom-title leading-tight mb-4">
+          <h1 className="font-zodiak text-4xl text-twom-title leading-tight mb-4">
             Frequently Asked Questions
           </h1>
-          <p className="text-sm md:text-base text-twom-muted max-w-2xl leading-relaxed">
+          <p className="text-sm text-twom-muted leading-relaxed">
             Everything you need to know about purchasing, sizing, order
             fulfillment, and atelier collections.
           </p>
@@ -67,14 +67,14 @@ export default function FAQPage() {
         {/* FAQs List */}
         <div className="bg-white border border-zinc-200/90 rounded-2xl shadow-xs divide-y divide-zinc-100 overflow-hidden">
           {FAQS.map((faq, index) => (
-            <div key={faq.question} className="p-6 sm:p-8 space-y-2">
+            <div key={faq.question} className="p-6 space-y-2">
               <span className="text-[10px] uppercase font-mono tracking-widest text-zinc-400 block">
                 0{index + 1}
               </span>
-              <h2 className="font-zodiak text-xl sm:text-2xl text-twom-title">
+              <h2 className="font-zodiak text-xl text-twom-title">
                 {faq.question}
               </h2>
-              <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed pt-1">
+              <p className="text-xs text-zinc-600 leading-relaxed pt-1">
                 {faq.answer}
               </p>
             </div>
@@ -82,7 +82,7 @@ export default function FAQPage() {
         </div>
 
         {/* Footer Support */}
-        <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-zinc-200/80">
+        <div className="pt-4 flex flex-col items-stretch gap-4 border-t border-zinc-200/80">
           <div>
             <p className="text-xs text-zinc-500 font-mono">
               Have a question not addressed here?
@@ -94,7 +94,7 @@ export default function FAQPage() {
 
           <Link
             href="/products"
-            className="w-full sm:w-auto liquid-glass-pill rounded-full text-black font-bold px-8 py-3.5 text-xs uppercase tracking-[0.2em] font-nippo hover:scale-[1.02] active:scale-[0.98] transition-all text-center"
+            className="w-full liquid-glass-pill rounded-full text-black font-bold px-8 py-3.5 text-xs uppercase tracking-[0.2em] font-nippo hover:scale-[1.02] active:scale-[0.98] transition-all text-center"
           >
             Explore Collection →
           </Link>

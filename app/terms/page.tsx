@@ -15,14 +15,14 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
   return (
-    <div className="w-full min-h-screen bg-twom-bg pt-[4.25rem] md:pt-[4.75rem] pb-16 md:pb-24 px-4 md:px-6 text-twom-body font-sans">
-      <div className="max-w-3xl mx-auto space-y-10">
+    <div className="w-full min-h-screen bg-twom-bg pt-[4.25rem] pb-16 px-4 text-twom-body font-sans">
+      <div className="w-full space-y-8">
         {/* Header */}
         <div>
           <span className="text-xs uppercase tracking-[0.25em] text-twom-muted font-mono block mb-3">
             Legal &bull; Atelier Governance
           </span>
-          <h1 className="font-zodiak text-4xl sm:text-5xl text-twom-title leading-tight mb-4">
+          <h1 className="font-zodiak text-4xl text-twom-title leading-tight mb-4">
             Terms of Service
           </h1>
           <p className="text-xs text-twom-muted font-mono">
@@ -31,7 +31,7 @@ export default function TermsPage() {
         </div>
 
         {/* Content Sections */}
-        <div className="bg-white p-8 md:p-12 border border-zinc-200/90 rounded-2xl shadow-xs space-y-8 text-xs leading-relaxed text-zinc-700">
+        <div className="bg-white p-6 border border-zinc-200/90 rounded-2xl shadow-xs space-y-6 text-xs leading-relaxed text-zinc-700">
           <section className="space-y-3">
             <h2 className="font-zodiak text-xl text-twom-title">
               1. Scope & Atelier Operations

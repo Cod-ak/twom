@@ -7,6 +7,7 @@ import CartDrawer from "../components/CartDrawer";
 import QuickBuySheet from "../components/QuickBuySheet";
 import AnalyticsScripts from "../components/AnalyticsScripts";
 import SmoothScroll from "../components/SmoothScroll";
+import StorefrontShell from "../components/StorefrontShell";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
 
@@ -96,11 +97,13 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col font-sans bg-twom-bg text-twom-body">
         <SmoothScroll />
         <AnalyticsScripts />
-        <Navbar />
-        <CartDrawer />
-        <QuickBuySheet />
-        {children}
-        <Footer />
+        <StorefrontShell>
+          <Navbar />
+          <CartDrawer />
+          <QuickBuySheet />
+          {children}
+          <Footer />
+        </StorefrontShell>
       </body>
     </html>
   );

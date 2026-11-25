@@ -49,29 +49,29 @@ const ARCHIVE_EDITIONS = [
 
 export default function ArchivePage() {
   return (
-    <div className="w-full min-h-screen bg-twom-bg pt-[4.25rem] md:pt-[4.75rem] pb-16 md:pb-24 px-4 md:px-6 text-twom-body font-sans">
-      <div className="max-w-5xl mx-auto space-y-12">
+    <div className="w-full min-h-screen bg-twom-bg pt-[4.25rem] pb-16 px-4 text-twom-body font-sans">
+      <div className="w-full space-y-10">
         {/* Header */}
-        <div className="border-b border-zinc-200 pb-8">
+        <div className="border-b border-zinc-200 pb-6">
           <span className="text-xs uppercase tracking-[0.25em] text-twom-muted font-mono block mb-3">
             Permanent Exhibition &bull; Retrospective
           </span>
-          <h1 className="font-zodiak text-4xl sm:text-6xl text-twom-title leading-tight mb-4">
+          <h1 className="font-zodiak text-4xl text-twom-title leading-tight mb-4">
             The Atelier Archive
           </h1>
-          <p className="text-sm md:text-base text-twom-muted max-w-2xl leading-relaxed">
+          <p className="text-sm text-twom-muted leading-relaxed">
             A permanent visual catalogue of historical garment cuts, obsolete textile developments, and milestone collections released by TWOM since inception.
           </p>
         </div>
 
         {/* Editions Grid */}
-        <div className="space-y-12">
+        <div className="space-y-8">
           {ARCHIVE_EDITIONS.map((item, idx) => (
             <div
               key={idx}
-              className="bg-white border border-zinc-200/90 rounded-2xl overflow-hidden shadow-xs grid grid-cols-1 md:grid-cols-2"
+              className="bg-white border border-zinc-200/90 rounded-2xl overflow-hidden shadow-xs grid grid-cols-1"
             >
-              <div className="relative aspect-[4/3] md:aspect-auto min-h-[300px] bg-zinc-100">
+              <div className="relative aspect-[4/3] bg-zinc-100">
                 <Image
                   src={item.image}
                   alt={item.title}
@@ -80,7 +80,7 @@ export default function ArchivePage() {
                 />
               </div>
 
-              <div className="p-8 sm:p-12 flex flex-col justify-between space-y-6">
+              <div className="p-6 flex flex-col justify-between space-y-5">
                 <div className="space-y-3">
                   <div className="flex items-center justify-between text-xs font-mono text-zinc-400">
                     <span className="uppercase tracking-widest">{item.edition}</span>

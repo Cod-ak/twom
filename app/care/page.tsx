@@ -16,17 +16,17 @@ export const metadata: Metadata = {
 
 export default function CarePage() {
   return (
-    <div className="w-full min-h-screen bg-twom-bg pt-[4.25rem] md:pt-[4.75rem] pb-16 md:pb-24 px-4 md:px-6 text-twom-body font-sans">
-      <div className="max-w-4xl mx-auto space-y-12">
+    <div className="w-full min-h-screen bg-twom-bg pt-[4.25rem] pb-16 px-4 text-twom-body font-sans">
+      <div className="w-full space-y-10">
         {/* Header */}
         <div>
           <span className="text-xs uppercase tracking-[0.25em] text-twom-muted font-mono block mb-3">
             Client Services &bull; Longevity
           </span>
-          <h1 className="font-zodiak text-4xl sm:text-6xl text-twom-title leading-tight mb-4">
+          <h1 className="font-zodiak text-4xl text-twom-title leading-tight mb-4">
             Fabric & Garment Care
           </h1>
-          <p className="text-sm md:text-base text-twom-muted max-w-2xl leading-relaxed">
+          <p className="text-sm text-twom-muted leading-relaxed">
             TWOM garments are crafted from substantial, high-density textiles
             engineered to soften and mature with time. Following these
             principles preserves their architectural silhouette, fiber density,
@@ -35,16 +35,16 @@ export default function CarePage() {
         </div>
 
         {/* Fabric Care Matrix */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6">
           {/* Card 1: Combed Cotton & Loopback Fleece */}
-          <div className="bg-white p-7 sm:p-8 border border-zinc-200/90 rounded-2xl shadow-xs space-y-4">
+          <div className="bg-white p-6 border border-zinc-200/90 rounded-2xl shadow-xs space-y-4">
             <span className="text-[10px] uppercase font-mono tracking-widest text-zinc-400 block">
               320GSM – 480GSM Textiles
             </span>
             <h2 className="font-zodiak text-2xl text-twom-title">
               Heavyweight Cotton & Fleece
             </h2>
-            <ul className="space-y-3 text-xs md:text-sm text-zinc-600 leading-relaxed list-disc list-inside">
+            <ul className="space-y-3 text-xs text-zinc-600 leading-relaxed list-disc list-inside">
               <li>
                 <strong className="text-black">Cold Wash Only:</strong> Machine
                 wash inside out in cold water (maximum 30°C / 85°F) on a gentle
@@ -68,14 +68,14 @@ export default function CarePage() {
           </div>
 
           {/* Card 2: Tailoring, Worsted Wool & Outerwear */}
-          <div className="bg-white p-7 sm:p-8 border border-zinc-200/90 rounded-2xl shadow-xs space-y-4">
+          <div className="bg-white p-6 border border-zinc-200/90 rounded-2xl shadow-xs space-y-4">
             <span className="text-[10px] uppercase font-mono tracking-widest text-zinc-400 block">
               Architectural Tailoring
             </span>
             <h2 className="font-zodiak text-2xl text-twom-title">
               Woolens, Blends & Outerwear
             </h2>
-            <ul className="space-y-3 text-xs md:text-sm text-zinc-600 leading-relaxed list-disc list-inside">
+            <ul className="space-y-3 text-xs text-zinc-600 leading-relaxed list-disc list-inside">
               <li>
                 <strong className="text-black">Specialist Dry Clean:</strong>{" "}
                 Structured trousers, blazers, and overcoats should only be
@@ -101,14 +101,14 @@ export default function CarePage() {
         </div>
 
         {/* Philosophy Card */}
-        <div className="p-8 bg-white border border-zinc-200/90 rounded-2xl shadow-xs space-y-4">
+        <div className="p-6 bg-white border border-zinc-200/90 rounded-2xl shadow-xs space-y-4">
           <span className="text-[10px] uppercase tracking-widest font-mono text-zinc-400 block">
             The Atelier Commitment
           </span>
           <h2 className="font-zodiak text-2xl text-twom-title">
             Permanence Over Trend
           </h2>
-          <p className="text-xs md:text-sm text-twom-muted leading-relaxed">
+          <p className="text-xs text-twom-muted leading-relaxed">
             We believe durability is the ultimate standard of luxury. When cared
             for deliberately, TWOM garments are designed to endure across
             seasons and develop a richer, personalized patina with every year of
@@ -117,7 +117,7 @@ export default function CarePage() {
         </div>
 
         {/* Support CTA */}
-        <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-zinc-200/80">
+        <div className="pt-4 flex flex-col items-stretch gap-4 border-t border-zinc-200/80">
           <div>
             <p className="text-xs text-zinc-500 font-mono">
               Have questions regarding a specific fabric or garment?
@@ -129,7 +129,7 @@ export default function CarePage() {
 
           <Link
             href="/products"
-            className="w-full sm:w-auto liquid-glass-pill rounded-full text-black font-bold px-8 py-3.5 text-xs uppercase tracking-[0.2em] font-nippo hover:scale-[1.02] active:scale-[0.98] transition-all text-center"
+            className="w-full liquid-glass-pill rounded-full text-black font-bold px-8 py-3.5 text-xs uppercase tracking-[0.2em] font-nippo hover:scale-[1.02] active:scale-[0.98] transition-all text-center"
           >
             Explore Collection →
           </Link>

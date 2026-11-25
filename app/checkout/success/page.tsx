@@ -75,10 +75,10 @@ export default async function CheckoutSuccessPage({
   }
 
   return (
-    <div className="min-h-screen bg-twom-bg pt-[4.25rem] md:pt-[4.75rem] pb-16 md:pb-24 px-4 md:px-6 flex flex-col items-center">
+    <div className="min-h-screen bg-twom-bg pt-[4.25rem] pb-16 px-4 flex flex-col items-center">
       <ClearCartOnMount order={order} />
 
-      <div className="max-w-2xl w-full bg-white border border-zinc-200 p-8 md:p-12 shadow-xs">
+      <div className="w-full bg-white border border-zinc-200 p-6 shadow-xs">
         {/* Header */}
         <div className="text-center pb-8 border-b border-zinc-100">
           <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700">
@@ -100,7 +100,7 @@ export default async function CheckoutSuccessPage({
           <span className="text-[10px] uppercase tracking-[0.25em] font-mono text-zinc-500">
             Acquisition Confirmed
           </span>
-          <h1 className="font-zodiak text-3xl md:text-4xl text-twom-title mt-2">
+          <h1 className="font-zodiak text-3xl text-twom-title mt-2">
             Thank you for your order
           </h1>
           <p className="text-xs text-twom-muted mt-2">

@@ -5,17 +5,17 @@ export const instant = false;
 
 export default function StoryPage() {
   return (
-    <div className="w-full min-h-screen bg-twom-bg pt-17 md:pt-19 pb-16 md:pb-24 px-4 md:px-6 text-twom-body font-sans">
-      <div className="max-w-4xl mx-auto">
+    <div className="w-full min-h-screen bg-twom-bg pt-17 pb-16 px-4 text-twom-body font-sans">
+      <div className="w-full">
         <span className="text-xs uppercase tracking-[0.25em] text-twom-muted font-mono block mb-3">
           The Manifesto
         </span>
-        <h1 className="font-zodiak text-4xl sm:text-6xl text-twom-title leading-tight mb-8">
+        <h1 className="font-zodiak text-4xl text-twom-title leading-tight mb-6">
           The World of TWOM
         </h1>
 
-        <div className="prose prose-zinc max-w-none text-base md:text-lg leading-relaxed space-y-6">
-          <p className="font-medium text-twom-title text-xl md:text-2xl leading-snug">
+        <div className="prose prose-zinc max-w-none text-sm leading-relaxed space-y-5">
+          <p className="font-medium text-twom-title text-xl leading-snug">
             Designed for working professionals. The art of restraint.
           </p>
 

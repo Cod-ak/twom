@@ -47,7 +47,7 @@ export default function ProductImageGallery({
   };
 
   return (
-    <div className="relative w-full aspect-4/5 sm:aspect-4/4.8 rounded-[32px] sm:rounded-[36px] overflow-hidden bg-[#f0ede8] shadow-md border border-zinc-200/50 group select-none isolate">
+    <div className="relative w-full aspect-4/5 rounded-[28px] overflow-hidden bg-[#f0ede8] shadow-md border border-zinc-200/50 group select-none isolate">
       {/* Horizontal Scroll / Touch-Swipe Track */}
       <div
         ref={scrollRef}
@@ -70,7 +70,7 @@ export default function ProductImageGallery({
                 alt={`${name} - View ${index + 1}`}
                 fill
                 priority={index === 0}
-                sizes="(max-width: 768px) 100vw, 50vw"
+                sizes="430px"
                 className={`transition-transform duration-700 ease-out ${
                   isLogoPlaceholder
                     ? "object-contain p-12"
@@ -90,7 +90,7 @@ export default function ProductImageGallery({
               type="button"
               onClick={() => scrollToIndex(activeIndex - 1)}
               aria-label="Previous image"
-              className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/90 hover:bg-white text-black items-center justify-center shadow-md transition-all opacity-0 group-hover:opacity-100 cursor-pointer active:scale-95"
+              className="flex absolute left-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-white/90 hover:bg-white text-black items-center justify-center shadow-md transition-all opacity-0 group-hover:opacity-100 cursor-pointer active:scale-95"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -114,7 +114,7 @@ export default function ProductImageGallery({
               type="button"
               onClick={() => scrollToIndex(activeIndex + 1)}
               aria-label="Next image"
-              className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/90 hover:bg-white text-black items-center justify-center shadow-md transition-all opacity-0 group-hover:opacity-100 cursor-pointer active:scale-95"
+              className="flex absolute right-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-white/90 hover:bg-white text-black items-center justify-center shadow-md transition-all opacity-0 group-hover:opacity-100 cursor-pointer active:scale-95"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

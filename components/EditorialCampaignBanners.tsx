@@ -31,10 +31,10 @@ export default function EditorialCampaignBanners({
     activeBanner.image.includes("Twom.png");
 
   return (
-    <section className="w-full max-w-7xl mx-auto px-4 md:px-6 py-0">
+    <section className="w-full px-4 py-0">
       <Link
         href={activeBanner.link}
-        className={`group relative block h-175 md:h-175 w-full overflow-hidden ${
+        className={`group relative block h-175 w-full overflow-hidden ${
           isLogo ? "bg-zinc-950" : "bg-zinc-100"
         }`}
       >
@@ -42,7 +42,7 @@ export default function EditorialCampaignBanners({
           src={activeBanner.image}
           alt={`${activeBanner.title} Campaign`}
           fill
-          sizes="(max-width: 768px) 100vw, 100vw"
+          sizes="430px"
           priority={activeBanner.priority}
           className={`transition-transform duration-700 ease-out group-hover:scale-105 ${
             isLogo
@@ -55,11 +55,11 @@ export default function EditorialCampaignBanners({
         <div className="absolute inset-0 bg-linear-to-b from-black/55 via-black/15 to-transparent pointer-events-none" />
 
         {/* Editorial Typography Overlay */}
-        <div className="absolute top-4 left-4 md:top-8 md:left-8 z-10 flex flex-col items-start gap-1">
-          <h2 className="font-nippo italic font-black text-2xl md:text-3xl text-white uppercase tracking-wider drop-shadow-sm leading-tight">
+        <div className="absolute top-4 left-4 z-10 flex flex-col items-start gap-1">
+          <h2 className="font-nippo italic font-black text-2xl text-white uppercase tracking-wider drop-shadow-sm leading-tight">
             {activeBanner.title}
           </h2>
-          <span className="font-nippo italic font-bold text-[11px] md:text-xs text-white uppercase tracking-wider underline underline-offset-4 group-hover:opacity-80 transition-opacity">
+          <span className="font-nippo italic font-bold text-[11px] text-white uppercase tracking-wider underline underline-offset-4 group-hover:opacity-80 transition-opacity">
             Shop Now
           </span>
         </div>

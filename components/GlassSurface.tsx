@@ -82,6 +82,7 @@ export interface GlassSurfaceProps {
   refraction?: boolean;
   renderer?: GlassSurfaceRenderer;
   backdrop?: RefObject<GlassSurfaceBackdrop | null> | GlassSurfaceBackdrop | null;
+  backdropTint?: string;
   shape?: string;
   className?: string;
   contentClassName?: string;
@@ -484,6 +485,9 @@ const SHEEN =
 const RIM =
   'linear-gradient(150deg, light-dark(hsl(0 0% 100% / 0.7), hsl(0 0% 100% / 0.34)), light-dark(hsl(0 0% 100% / 0.1), hsl(0 0% 100% / 0.03)) 45%, light-dark(hsl(0 0% 100% / 0.08), hsl(0 0% 100% / 0.02)) 60%, light-dark(hsl(0 0% 100% / 0.42), hsl(0 0% 100% / 0.18)))';
 
+const CHROMATIC_RIM =
+  'linear-gradient(135deg, rgba(255, 200, 140, 0.72) 0%, rgba(255, 255, 255, 0.45) 28%, rgba(140, 225, 255, 0.72) 60%, rgba(255, 175, 110, 0.68) 100%)';
+
 const RING =
   'linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)';
 
@@ -534,6 +538,7 @@ const GlassSurface = ({
   refraction = true,
   renderer = 'auto',
   backdrop,
+  backdropTint,
   shape,
   className = '',
   contentClassName,
@@ -608,6 +613,9 @@ const GlassSurface = ({
     yChannel,
   ]);
 
+  const safeBlur = Math.max(0, blur);
+  const safeBackgroundOpacity = Math.max(0, Math.min(1, backgroundOpacity));
+
   const generateDisplacementMap = () => {
     const rect = containerRef.current?.getBoundingClientRect();
     const actualWidth = rect?.width || 400;
@@ -626,7 +634,7 @@ const GlassSurface = ({
             <stop offset="100%" stop-color="blue"/>
           </linearGradient>
           <filter id="${softId}" filterUnits="userSpaceOnUse" x="0" y="0" width="${actualWidth}" height="${actualHeight}" color-interpolation-filters="sRGB">
-            <feGaussianBlur stdDeviation="${blur}" />
+            <feGaussianBlur stdDeviation="${safeBlur}" />
           </filter>
         </defs>
         <rect x="0" y="0" width="${actualWidth}" height="${actualHeight}" fill="black"></rect>
@@ -1068,16 +1076,18 @@ const GlassSurface = ({
       ? { opacity: 0, transition: 'none' }
       : {};
 
-  const frost = blurSupported
-    ? `light-dark(hsl(0 0% 100% / ${0.12 + backgroundOpacity * 0.5}), hsl(0 0% 100% / ${0.04 + backgroundOpacity * 0.3}))`
-    : 'light-dark(hsl(0 0% 100% / 0.72), hsl(0 0% 12% / 0.72))';
+  const frost = backdropTint
+    ? backdropTint
+    : blurSupported
+      ? `light-dark(hsl(0 0% 100% / ${0.12 + safeBackgroundOpacity * 0.5}), hsl(0 0% 100% / ${0.04 + safeBackgroundOpacity * 0.3}))`
+      : 'light-dark(hsl(0 0% 100% / 0.72), hsl(0 0% 12% / 0.72))';
   const fallbackFilter = `blur(12px) saturate(${saturation * 1.4}) brightness(1.04)`;
 
   const modeStyle: CSSProperties = webgl
     ? { boxShadow: WEBGL_SHADOW }
     : refractive
       ? {
-          background: `light-dark(hsl(0 0% 100% / ${backgroundOpacity}), hsl(0 0% 0% / ${backgroundOpacity}))`,
+          background: `light-dark(hsl(0 0% 100% / ${safeBackgroundOpacity}), hsl(0 0% 0% / ${safeBackgroundOpacity}))`,
           backdropFilter: `url(#${filterId}) saturate(${saturation})`,
           boxShadow: SVG_SHADOW,
         }
@@ -1204,7 +1214,9 @@ const GlassSurface = ({
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 rounded-[inherit]"
           style={{
-            background: `light-dark(hsl(0 0% 100% / ${backgroundOpacity}), hsl(0 0% 0% / ${backgroundOpacity}))`,
+            background:
+              backdropTint ??
+              `light-dark(hsl(0 0% 100% / ${safeBackgroundOpacity}), hsl(0 0% 0% / ${safeBackgroundOpacity}))`,
             boxShadow: outline ? 'none' : FRAME_SHADOW,
           }}
         />
@@ -1221,7 +1233,7 @@ const GlassSurface = ({
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 rounded-[inherit] p-0.75"
           style={{
-            background: RIM,
+            background: refraction && backdropTint ? CHROMATIC_RIM : RIM,
             WebkitMask: RING,
             WebkitMaskComposite: 'xor',
             mask: RING,

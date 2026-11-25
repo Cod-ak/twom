@@ -30,7 +30,7 @@ export default function NewsletterForm() {
     <div className="w-full">
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col sm:flex-row items-stretch gap-3"
+        className="flex flex-col items-stretch gap-3"
       >
         <input
           type="email"
@@ -39,7 +39,7 @@ export default function NewsletterForm() {
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Enter your email address"
           disabled={isPending}
-          className="bg-transparent border border-twom-border px-4 py-3 text-xs sm:text-sm text-twom-title placeholder:text-twom-muted/60 focus:outline-none focus:border-twom-title flex-1 transition-colors disabled:opacity-50"
+          className="bg-transparent border border-twom-border px-4 py-3 text-xs text-twom-title placeholder:text-twom-muted/60 focus:outline-none focus:border-twom-title flex-1 transition-colors disabled:opacity-50"
         />
         <button
           type="submit"

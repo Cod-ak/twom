@@ -116,17 +116,13 @@ export default async function Home() {
         </div>
       </div>
 
-      {/* Featured Pieces Selection (Single Pieces Only) */}
-      <section
-        id="collection"
-        className="max-w-7xl mx-auto px-4 md:px-6 pt-6 pb-4"
-      >
-        {/* Mobile Horizontal Carousel & Desktop Grid */}
-        <div className="flex items-stretch md:grid md:grid-cols-2 gap-4 md:gap-6 overflow-x-auto md:overflow-visible snap-x snap-mandatory scroll-px-4 no-scrollbar -mx-4 px-4 md:scroll-px-0 md:mx-0 md:px-0 pb-2">
+      {/* Featured Pieces Selection (Single Pieces Only - Mobile Carousel Locked) */}
+      <section id="collection" className="w-full px-4 pt-6 pb-4">
+        <div className="flex items-stretch gap-4 overflow-x-auto snap-x snap-mandatory scroll-px-4 no-scrollbar -mx-4 px-4 pb-2">
           {featuredProducts.map((product: Product) => (
             <div
               key={product.id}
-              className="w-[72vw] min-w-[72vw] sm:w-[48vw] sm:min-w-[48vw] shrink-0 snap-start md:w-auto md:min-w-0 md:shrink flex flex-col h-full"
+              className="w-[76%] min-w-[76%] shrink-0 snap-start flex flex-col h-full"
             >
               <ProductCard product={product} />
             </div>
